@@ -1,357 +1,790 @@
+#!/usr/bin/env python3
+"""Interactive Python port scanner.
+
+Use only on systems you own or are authorised to test.
+Requires:
+    pip install python-nmap
+    nmap installed on the operating system
+"""
+
+from __future__ import annotations
+
+import concurrent.futures
+import csv
+import ipaddress
+import logging
 import os
 import socket
-import concurrent.futures
-import logging
-import csv
-import nmap 
+import sys
+from dataclasses import dataclass
 from datetime import datetime
-import ipaddress
+from pathlib import Path
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-# Commonly used ports for quick scans
-COMMON_PORTS = [80, 443, 22, 21, 25]
+try:
+    import nmap
+except ImportError:
+    nmap = None  # type: ignore[assignment]
 
-# Ports considered as security issues
-SECURITY_PORTS = [23]  # Telnet port
 
-# Set of reserved ports (adjust as needed)
-RESERVED_PORTS = set(range(0, 1024))
+COMMON_PORTS = sorted(
+    {
+        20, 21, 22, 23, 25, 53, 69, 80, 110, 123, 143, 161, 389, 443,
+        445, 587, 993, 995, 1433, 1521, 3306, 3389, 5432, 5900, 6379,
+        8080,
+    }
+)
 
-# Function to scan a specific port on a target
-def scan_port(target, port, filter_mode, allow_reserved_ports):
+SECURITY_PORTS: Mapping[int, str] = {
+    21: "FTP",
+    23: "Telnet",
+    69: "TFTP",
+}
+
+RESERVED_PORTS = range(1, 1024)
+DEFAULT_TIMEOUT = 1.0
+DEFAULT_WORKERS = 100
+MAX_WORKERS = 500
+OUTPUT_DIRECTORY = Path.home() / "Downloads"
+
+
+class Colour:
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    CYAN = "\033[96m"
+    RESET = "\033[0m"
+
+
+@dataclass(frozen=True)
+class PortResult:
+    port: int
+    state: str
+
+
+@dataclass
+class ServiceInfo:
+    service: str = "Unknown"
+    product: str = ""
+    version: str = ""
+    extra: str = ""
+    cpe: str = ""
+    banner: str = ""
+
+
+@dataclass
+class ScanOptions:
+    timeout: float
+    workers: int
+    mode: str
+    allow_reserved_ports: bool
+    filter_mode: str
+    service_detection: bool
+    banner_collection: bool
+    vulnerability_scan: bool
+    os_detection: bool
+    export_csv: bool
+    save_summary: bool
+
+
+def supports_colour() -> bool:
+    return sys.stdout.isatty() and os.environ.get("TERM", "") != "dumb"
+
+
+def colourise(text: str, colour: str) -> str:
+    return f"{colour}{text}{Colour.RESET}" if supports_colour() else text
+
+
+def safe_filename(value: str) -> str:
+    return "".join(char if char.isalnum() or char in "-_." else "_" for char in value)
+
+
+def prepare_output_directory() -> Path:
     try:
-        if port in RESERVED_PORTS and not allow_reserved_ports:
-            return port, "skipped (User skipped Reserved Ports)"
+        OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
+        return OUTPUT_DIRECTORY
+    except OSError:
+        fallback = Path.cwd() / "scan_results"
+        fallback.mkdir(parents=True, exist_ok=True)
+        return fallback
 
-        with socket.create_connection((target, port), timeout=1) as sock:
-            if port in SECURITY_PORTS:
-                return port, "open (Security Issue - Telnet detected)"
-            else:
-                # Identify service and protocol for open ports
-                service, protocol = identify_service(target, port)
-                status = f"open ({service} service, {protocol} protocol)"
-                if filter_mode == 'open' and 'open' not in status:
-                    status = 'filtered'
-                elif filter_mode == 'closed' and 'closed' not in status:
-                    status = 'filtered'
-                return port, status
-    except ConnectionRefusedError:
-        return port, "closed (Connection Refused)"
-    except socket.timeout:
-        return port, "closed (Timeout - Network Issue)"
-    except Exception as e:
-        return port, f"error: {e}"
 
-# Function to identify the service running on a specific port
-def identify_service(target, port):
+def configure_logger(target: str) -> Tuple[logging.Logger, Path]:
+    output_dir = prepare_output_directory()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    safe_target = safe_filename(target)
+    log_path = output_dir / f"{safe_target}_{timestamp}_scan.log"
+
+    logger = logging.getLogger(f"port_scanner.{safe_target}.{timestamp}")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    logger.handlers.clear()
+
+    handler = logging.FileHandler(log_path, encoding="utf-8")
+    handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+    logger.addHandler(handler)
+    return logger, log_path
+
+
+def print_banner() -> None:
+    print("\n" + "=" * 64)
+    print("                 PROFESSIONAL PYTHON PORT SCANNER")
+    print("=" * 64)
+    print("Scan only systems that you own or are authorised to test.")
+
+
+def validate_ip(target: str) -> bool:
     try:
-        nm = nmap.PortScanner()
-        nm.scan(target, str(port))
-
-        if nm[target].has_tcp(port) and nm[target]['tcp'][port]['state'] == 'open':
-            service = nm[target]['tcp'][port]['name']
-            product = nm[target]['tcp'][port]['product']
-            version = nm[target]['tcp'][port]['version']
-            cpe = nm[target]['tcp'][port]['cpe']
-
-            if cpe:
-                return f"{service} ({cpe})", "TCP"
-            else:
-                return f"{service} ({product} {version})", "TCP"
-        else:
-            return "Unknown", "Unknown"
-    except Exception as e:
-        return "Unknown", "Unknown"
-
-# Function to check security issues on a specific port
-def check_security_issues(target, port):
-    try:
-        nm = nmap.PortScanner()
-        nm.scan(target, arguments=f'-p {port} --script vulners,vulscan')
-
-        issues = []
-
-        if target in nm.all_hosts() and 'tcp' in nm[target]:
-            for script_id, output in nm[target]['tcp'][port]['script'].items():
-                if 'VULNERABILITY' in output:
-                    vulnerabilities = output['VULNERABILITY']
-                    for vulnerability in vulnerabilities:
-                        issues.append((port, vulnerability['id'], vulnerability['output']))
-
-        return issues
-    except Exception as e:
-        return [(port, f"Error during security check for {target}:{port}: {e}")]
-
-# Function to filter ports based on a specified mode (open/closed/all)
-def filter_ports(results, filter_mode):
-    if filter_mode == 'all':
-        return results
-    else:
-        return [(port, status) for port, status in results if filter_mode in status.lower()]
-
-# Function to perform port scanning on a list of ports for a target
-def scan_ports(target, ports, filter_mode, allow_reserved_ports):
-    results = []
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        args_list = [(target, port, filter_mode, allow_reserved_ports) for port in ports]
-        results = list(executor.map(scan_port_wrapper, args_list))
-    return results
-
-# Wrapper function for scan_port to be used with ThreadPoolExecutor
-def scan_port_wrapper(args):
-    return scan_port(*args)
-
-# Function to validate user input for port numbers
-def validate_port_input(port_input):
-    try:
-        port = int(port_input)
-        if 0 < port <= 65535:
-            return port
+        ipaddress.ip_address(target)
+        return True
     except ValueError:
-        pass
-    print("Invalid port number. Please enter a valid port.")
-    return None
-
-# Function to get target IP addresses or hostnames from user input
-def get_targets():
-    while True:
-        target_input = input("\nEnter target IP addresses or hostnames (separated by space): ")
-        targets = target_input.split()
-
-        validated_targets = []
-        invalid_targets = []
-
-        for target in targets:
-            if validate_ip(target) or validate_hostname(target):
-                validated_targets.append(target)
-            else:
-                invalid_targets.append(target)
-
-        if invalid_targets:
-            print(f"\nInvalid target(s): {', '.join(invalid_targets)}. Please enter valid IP addresses or hostnames.")
-        else:
-            break
-    return validated_targets
-
-# Function to validate an IP address
-def validate_ip(ip):
-    try:
-        socket.inet_pton(socket.AF_INET, ip)
-        return True
-    except socket.error:
-        try:
-            socket.inet_pton(socket.AF_INET6, ip)
-            return True
-        except socket.error:
-            return False
-
-# Function to validate a hostname
-def validate_hostname(hostname):
-    try:
-        socket.gethostbyname(hostname)
-        return True
-    except socket.error:
         return False
 
-# Function to get user-defined custom ports for scanning
-def get_custom_ports():
-    custom_ports = input("\nEnter custom ports (separated by space): ").split()
-    return [validate_port_input(port) for port in custom_ports if validate_port_input(port)]
 
-# Function to get scan options from the user
-def get_scan_options():
-    print("\nChoose the type of scan:")
-    print("  (s) Standard Scan: Scan a specific range of ports.")
-    print("  (c) Custom Scan: Scan user-defined custom ports.")
-    print("  (q) Quick Scan: Scan common ports.")
-    print("  (t) Thorough Scan: Scan all ports (1-65535).")
-
-    while True:
-        scan_type = input("Enter your choice (s/c/q/t): ").lower()
-
-        if scan_type == 's':
-            start_port = validate_port_input(input("Enter starting port: "))
-            end_port = validate_port_input(input("Enter ending port: "))
-            if start_port and end_port:
-                return range(start_port, end_port + 1), None
-        elif scan_type == 'c':
-            custom_ports = get_custom_ports()
-            return custom_ports, custom_ports
-        elif scan_type == 'q':
-            return COMMON_PORTS, None
-        elif scan_type == 't':
-            return range(1, 65536), None
-
-        print("Invalid choice. Please enter 's' for Standard Scan, 'c' for Custom Scan, 'q' for Quick Scan, or 't' for Thorough Scan.")
-
-# Function to get filter mode from the user (open/closed/all)
-def get_filter_mode():
-    while True:
-        filter_mode = input("\nFilter scan results by (open/closed/all)? ").lower()
-        if filter_mode in ['open', 'closed', 'all']:
-            return filter_mode
-        print("Invalid filter mode. Please enter 'open', 'closed', or 'all'.")
-
-# Function to get user's choice for exporting results to a CSV file
-def get_output_options():
-    export_csv = input("\nExport results to a CSV file? (y/n): ").lower() == 'y'
-    return export_csv
-
-# Function to get user's choice for performing a security scan
-def get_security_scan_option():
-    security_scan = input("\nPerform a security scan? (y/n): ").lower() == 'y'
-    return security_scan
-
-# Function to configure the logger for logging scan results
-def configure_logger(log_filename):
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-
-    formatter = logging.Formatter('%(asctime)s - %(message)s')
-
-    file_handler = logging.FileHandler(log_filename)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
-# Function to print the program banner
-def print_banner():
-    print("\n" + "=" * 40)
-    print("        Python Port Scanner")
-    print("=" * 40)
-
-# Function to save scan results to a CSV file
-def save_to_file(results, filename):
-    with open(filename, 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(['Target', 'Port', 'Status'])
-        csv_writer.writerows(results)
-
-# Function to perform service detection on open ports
-def perform_service_detection(target, open_ports):
+def validate_hostname(hostname: str) -> bool:
+    if not hostname or len(hostname) > 253:
+        return False
     try:
-        nm = nmap.PortScanner()
-        nm.scan(target, arguments='-sV')
+        socket.getaddrinfo(hostname, None)
+        return True
+    except socket.gaierror:
+        return False
 
-        detected_services = []
-        for port in open_ports:
-            if nm[target].has_tcp(port) and nm[target]['tcp'][port]['state'] == 'open':
-                service_name = nm[target]['tcp'][port]['name']
-                product = nm[target]['tcp'][port]['product']
-                version = nm[target]['tcp'][port]['version']
-                cpe = nm[target]['tcp'][port]['cpe']
 
-                if cpe:
-                    detected_services.append((port, f"{service_name} ({cpe})"))
-                else:
-                    detected_services.append((port, f"{service_name} ({product} {version})"))
+def validate_target(target: str) -> bool:
+    return validate_ip(target) or validate_hostname(target)
 
-        return detected_services
-    except Exception as e:
-        return [(port, f"Error during service detection: {e}") for port in open_ports]
 
-# Function to display scan results
-def display_scan_results(target, results):
-    print("\nScan Results:")
-    print(f"{'Target': <20}{'Port': <10}{'Status': <40}")
-    print("=" * 70)
-    for port, status in results:
-        print(f"{target: <20}{port: <10}{status}")
-        logging.info(f"Target {target} - Port {port} is {status}")
+def validate_port(value: str) -> Optional[int]:
+    try:
+        port = int(value)
+    except (TypeError, ValueError):
+        return None
+    return port if 1 <= port <= 65535 else None
 
-# Function to display detected services
-def display_detected_services(target, detected_services):
-    if detected_services:
-        print("\nDetected Services:")
-        print(f"{'Port': <10}{'Service': <40}")
-        print("=" * 70)
-        for port, service in detected_services:
-            print(f"{port: <10}{service}")
+
+def ask_yes_no(prompt: str, default: bool = False) -> bool:
+    suffix = " [Y/n]: " if default else " [y/N]: "
+    while True:
+        answer = input(prompt + suffix).strip().lower()
+        if not answer:
+            return default
+        if answer in {"y", "yes"}:
+            return True
+        if answer in {"n", "no"}:
+            return False
+        print("Please enter y or n.")
+
+
+def get_targets() -> List[str]:
+    while True:
+        values = input("\nEnter IP address(es) or hostname(s), separated by spaces: ").split()
+        if not values:
+            print("Enter at least one target.")
+            continue
+        invalid = [target for target in values if not validate_target(target)]
+        if invalid:
+            print(colourise("Invalid target(s): " + ", ".join(invalid), Colour.RED))
+            continue
+        return list(dict.fromkeys(values))
+
+
+def get_timeout() -> float:
+    value = input(f"Socket timeout [{DEFAULT_TIMEOUT}s]: ").strip()
+    if not value:
+        return DEFAULT_TIMEOUT
+    try:
+        timeout = float(value)
+        return timeout if timeout > 0 else DEFAULT_TIMEOUT
+    except ValueError:
+        return DEFAULT_TIMEOUT
+
+
+def get_workers() -> int:
+    value = input(f"Worker count [{DEFAULT_WORKERS}]: ").strip()
+    if not value:
+        return DEFAULT_WORKERS
+    try:
+        return min(max(int(value), 1), MAX_WORKERS)
+    except ValueError:
+        return DEFAULT_WORKERS
+
+
+def get_port_range() -> List[int]:
+    while True:
+        start = validate_port(input("Enter starting port: ").strip())
+        end = validate_port(input("Enter ending port: ").strip())
+        if start is None or end is None:
+            print("Ports must be between 1 and 65535.")
+        elif start > end:
+            print("Starting port cannot exceed ending port.")
+        else:
+            return list(range(start, end + 1))
+
+
+def get_custom_ports() -> List[int]:
+    while True:
+        raw_values = input("Enter ports separated by spaces or commas: ").replace(",", " ").split()
+        ports = [validate_port(value) for value in raw_values]
+        if not raw_values or any(port is None for port in ports):
+            print("Enter only valid ports between 1 and 65535.")
+            continue
+        return sorted(set(port for port in ports if port is not None))
+
+
+def get_scan_ports() -> Tuple[Optional[List[int]], Optional[str]]:
+    while True:
+        print("\nChoose scan type:")
+        print("  (s) Standard range")
+        print("  (c) Custom ports")
+        print("  (q) Quick common-port scan")
+        print("  (t) Thorough scan (1-65535)")
+        print("  (x) Exit")
+        choice = input("Choice: ").strip().lower()
+        if choice == "s":
+            return get_port_range(), "Standard"
+        if choice == "c":
+            return get_custom_ports(), "Custom"
+        if choice == "q":
+            return COMMON_PORTS.copy(), "Quick"
+        if choice == "t":
+            if ask_yes_no("Scan all 65,535 ports?", default=False):
+                return list(range(1, 65536)), "Thorough"
+        elif choice == "x":
+            return None, None
+        else:
+            print("Invalid choice.")
+
+
+def get_execution_mode() -> str:
+    while True:
+        print("\nChoose execution mode:")
+        print("  (t) Multithreading")
+        print("  (m) Multiprocessing")
+        print("  (s) Sequential")
+        choice = input("Choice: ").strip().lower()
+        if choice in {"t", "m", "s"}:
+            return choice
+        print("Invalid choice.")
+
+
+def get_filter_mode() -> str:
+    while True:
+        choice = input("Display results (open/closed/all): ").strip().lower()
+        if choice in {"open", "closed", "all"}:
+            return choice
+        print("Invalid choice.")
+
+
+def print_progress(current: int, total: int) -> None:
+    if total <= 0:
+        return
+    width = 36
+    fraction = current / total
+    filled = int(width * fraction)
+    bar = "█" * filled + "-" * (width - filled)
+    print(f"\r[{bar}] {current}/{total} ({fraction * 100:5.1f}%)", end="", flush=True)
+
+
+def scan_port(args: Tuple[str, int, float, bool]) -> PortResult:
+    target, port, timeout, allow_reserved_ports = args
+    if port in RESERVED_PORTS and not allow_reserved_ports:
+        return PortResult(port, "Skipped (Reserved Port)")
+    try:
+        with socket.create_connection((target, port), timeout=timeout):
+            if port in SECURITY_PORTS:
+                return PortResult(port, f"Open (Security Risk - {SECURITY_PORTS[port]})")
+            return PortResult(port, "Open")
+    except ConnectionRefusedError:
+        return PortResult(port, "Closed")
+    except socket.timeout:
+        return PortResult(port, "Filtered")
+    except socket.gaierror:
+        return PortResult(port, "Error (Name Resolution Failed)")
+    except OSError as error:
+        return PortResult(port, f"Error ({error.strerror or error})")
+
+
+def run_scan(
+    target: str,
+    ports: Sequence[int],
+    timeout: float,
+    allow_reserved_ports: bool,
+    workers: int,
+    mode: str,
+) -> Tuple[List[PortResult], float]:
+    arguments = [(target, port, timeout, allow_reserved_ports) for port in ports]
+    results: List[PortResult] = []
+    started = datetime.now()
+
+    if mode == "s":
+        for index, item in enumerate(arguments, start=1):
+            results.append(scan_port(item))
+            print_progress(index, len(arguments))
     else:
-        print("\nNo services detected.")
+        executor_class = (
+            concurrent.futures.ThreadPoolExecutor
+            if mode == "t"
+            else concurrent.futures.ProcessPoolExecutor
+        )
+        with executor_class(max_workers=workers) as executor:
+            futures = [executor.submit(scan_port, item) for item in arguments]
+            for index, future in enumerate(concurrent.futures.as_completed(futures), start=1):
+                try:
+                    results.append(future.result())
+                except Exception as error:
+                    item = arguments[index - 1]
+                    results.append(PortResult(item[1], f"Error ({error})"))
+                print_progress(index, len(arguments))
 
-# Function to display security issues
-def display_security_issues(target, security_issues):
-    if security_issues:
-        print("\nSecurity Issues:")
-        print(f"{'Port': <10}{'Issue': <40}")
-        print("=" * 70)
-        for port, issue in security_issues:
-            print(f"{port: <10}{issue}")
-            logging.warning(f"Target {target} - Port {port} is {issue}")
+    print()
+    results.sort(key=lambda result: result.port)
+    elapsed = (datetime.now() - started).total_seconds()
+    print(colourise(f"Socket scan completed in {elapsed:.2f} seconds.", Colour.GREEN))
+    return results, elapsed
+
+
+def filter_results(results: Sequence[PortResult], mode: str) -> List[PortResult]:
+    if mode == "all":
+        return list(results)
+    return [result for result in results if result.state.lower().startswith(mode)]
+
+
+def get_open_ports(results: Sequence[PortResult]) -> List[int]:
+    return [result.port for result in results if result.state.lower().startswith("open")]
+
+
+def get_nmap_scanner() -> Optional[object]:
+    if nmap is None:
+        print(colourise("python-nmap is not installed. Run: pip install python-nmap", Colour.RED))
+        return None
+    try:
+        return nmap.PortScanner()
+    except Exception as error:
+        print(colourise(f"Unable to start Nmap: {error}", Colour.RED))
+        return None
+
+
+def detect_services(target: str, open_ports: Sequence[int]) -> Dict[int, ServiceInfo]:
+    if not open_ports:
+        return {}
+    scanner = get_nmap_scanner()
+    if scanner is None:
+        return {}
+    print(colourise("Running Nmap service/version detection...", Colour.CYAN))
+    services: Dict[int, ServiceInfo] = {}
+    try:
+        scanner.scan(hosts=target, ports=",".join(map(str, open_ports)), arguments="-sV")
+        if target not in scanner.all_hosts():
+            return services
+        for port, info in scanner[target].get("tcp", {}).items():
+            services[int(port)] = ServiceInfo(
+                service=info.get("name", "Unknown"),
+                product=info.get("product", ""),
+                version=info.get("version", ""),
+                extra=info.get("extrainfo", ""),
+                cpe=info.get("cpe", ""),
+            )
+    except Exception as error:
+        print(colourise(f"Service detection failed: {error}", Colour.RED))
+    return services
+
+
+def grab_banner(target: str, port: int, timeout: float = 2.0) -> str:
+    try:
+        with socket.create_connection((target, port), timeout=timeout) as sock:
+            sock.settimeout(timeout)
+            data = sock.recv(1024)
+            return data.decode(errors="ignore").strip()
+    except (OSError, socket.timeout):
+        return ""
+
+
+def collect_banners(target: str, open_ports: Sequence[int], workers: int) -> Dict[int, str]:
+    if not open_ports:
+        return {}
+    print(colourise("Collecting passive service banners...", Colour.CYAN))
+    banners: Dict[int, str] = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(workers, 50)) as executor:
+        future_map = {executor.submit(grab_banner, target, port): port for port in open_ports}
+        for future in concurrent.futures.as_completed(future_map):
+            port = future_map[future]
+            try:
+                banners[port] = future.result()
+            except Exception:
+                banners[port] = ""
+    return banners
+
+
+def vulnerability_scan(target: str, open_ports: Sequence[int]) -> Dict[int, Dict[str, str]]:
+    if not open_ports:
+        return {}
+    scanner = get_nmap_scanner()
+    if scanner is None:
+        return {}
+    print(colourise("Running authorised Nmap vulnerability scripts...", Colour.CYAN))
+    findings: Dict[int, Dict[str, str]] = {}
+    try:
+        scanner.scan(
+            hosts=target,
+            ports=",".join(map(str, open_ports)),
+            arguments="-sV --script vulners,vulscan",
+        )
+        if target not in scanner.all_hosts():
+            return findings
+        for port, info in scanner[target].get("tcp", {}).items():
+            scripts = info.get("script", {})
+            findings[int(port)] = {str(name): str(output) for name, output in scripts.items()}
+    except Exception as error:
+        print(colourise(f"Vulnerability scan failed: {error}", Colour.RED))
+    return findings
+
+
+def detect_os(target: str) -> str:
+    scanner = get_nmap_scanner()
+    if scanner is None:
+        return "Unknown"
+    print(colourise("Running Nmap OS detection...", Colour.CYAN))
+    try:
+        scanner.scan(hosts=target, arguments="-O")
+        if target not in scanner.all_hosts():
+            return "Unknown"
+        matches = scanner[target].get("osmatch", [])
+        return matches[0].get("name", "Unknown") if matches else "Unknown"
+    except Exception as error:
+        return f"Unknown ({error})"
+
+
+def display_target_information(target: str) -> None:
+    print("\n" + "=" * 64)
+    print(f"Target: {target}")
+    try:
+        addresses = sorted({item[4][0] for item in socket.getaddrinfo(target, None)})
+        if addresses:
+            print("Resolved address(es): " + ", ".join(addresses))
+    except socket.gaierror:
+        pass
+    print("=" * 64)
+
+
+def display_results(
+    target: str,
+    results: Sequence[PortResult],
+    services: Mapping[int, ServiceInfo],
+) -> None:
+    print("\n" + "=" * 112)
+    print(f"Scan Results - {target}")
+    print("=" * 112)
+    print(f"{'Port':<8}{'State':<36}{'Service':<16}{'Product':<28}{'Version':<20}")
+    print("-" * 112)
+    for result in results:
+        service = services.get(result.port, ServiceInfo())
+        row = (
+            f"{result.port:<8}{result.state:<36}{service.service:<16}"
+            f"{service.product:<28}{service.version:<20}"
+        )
+        if result.state.startswith("Open"):
+            row = colourise(row, Colour.GREEN)
+        elif result.state.startswith("Closed"):
+            row = colourise(row, Colour.RED)
+        elif result.state.startswith("Filtered"):
+            row = colourise(row, Colour.YELLOW)
+        elif result.state.startswith("Skipped"):
+            row = colourise(row, Colour.BLUE)
+        print(row)
+
+
+def display_banners(banners: Mapping[int, str]) -> None:
+    non_empty = {port: banner for port, banner in banners.items() if banner}
+    if not non_empty:
+        print("\nNo passive banners were returned.")
+        return
+    print("\n" + "=" * 88)
+    print("Collected Banners")
+    print("=" * 88)
+    for port in sorted(non_empty):
+        print(f"\nPort {port}\n{'-' * 40}\n{non_empty[port]}")
+
+
+def display_vulnerabilities(findings: Mapping[int, Mapping[str, str]]) -> None:
+    non_empty = {port: scripts for port, scripts in findings.items() if scripts}
+    print("\n" + "=" * 88)
+    print("Security Findings")
+    print("=" * 88)
+    if not non_empty:
+        print("No vulnerability-script findings were returned.")
+        return
+    for port in sorted(non_empty):
+        print(f"\nPort {port}\n{'-' * 40}")
+        for script_name, output in non_empty[port].items():
+            print(f"\n[{script_name}]\n{output}")
+
+
+def scan_statistics(results: Sequence[PortResult]) -> Dict[str, int]:
+    stats = {"open": 0, "closed": 0, "filtered": 0, "skipped": 0, "error": 0}
+    for result in results:
+        state = result.state.lower()
+        if state.startswith("open"):
+            stats["open"] += 1
+        elif state.startswith("closed"):
+            stats["closed"] += 1
+        elif state.startswith("filtered"):
+            stats["filtered"] += 1
+        elif state.startswith("skipped"):
+            stats["skipped"] += 1
+        else:
+            stats["error"] += 1
+    return stats
+
+
+def display_statistics(stats: Mapping[str, int]) -> None:
+    print("\n" + "=" * 48)
+    print("Scan Summary")
+    print("=" * 48)
+    print(colourise(f"Open ports      : {stats['open']}", Colour.GREEN))
+    print(colourise(f"Closed ports    : {stats['closed']}", Colour.RED))
+    print(colourise(f"Filtered ports  : {stats['filtered']}", Colour.YELLOW))
+    print(colourise(f"Skipped ports   : {stats['skipped']}", Colour.BLUE))
+    print(f"Errors          : {stats['error']}")
+
+
+def create_output_paths(target: str) -> Dict[str, Path]:
+    output_dir = prepare_output_directory()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    base = f"{safe_filename(target)}_{timestamp}"
+    return {
+        "csv": output_dir / f"{base}_results.csv",
+        "summary": output_dir / f"{base}_summary.txt",
+    }
+
+
+def export_results_csv(
+    path: Path,
+    target: str,
+    results: Sequence[PortResult],
+    services: Mapping[int, ServiceInfo],
+    vulnerabilities: Mapping[int, Mapping[str, str]],
+) -> None:
+    with path.open("w", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(
+            [
+                "Target", "Port", "State", "Service", "Product", "Version",
+                "Extra", "CPE", "Banner", "Vulnerability Scripts",
+            ]
+        )
+        for result in results:
+            service = services.get(result.port, ServiceInfo())
+            scripts = " | ".join(vulnerabilities.get(result.port, {}).keys())
+            writer.writerow(
+                [
+                    target,
+                    result.port,
+                    result.state,
+                    service.service,
+                    service.product,
+                    service.version,
+                    service.extra,
+                    service.cpe,
+                    service.banner,
+                    scripts,
+                ]
+            )
+
+
+def save_summary(
+    path: Path,
+    target: str,
+    stats: Mapping[str, int],
+    elapsed: float,
+    open_ports: Sequence[int],
+    detected_os: str,
+) -> None:
+    open_port_text = ", ".join(map(str, open_ports)) if open_ports else "None"
+    with path.open("w", encoding="utf-8") as summary_file:
+        summary_file.write("=" * 64 + "\n")
+        summary_file.write("Python Port Scanner Summary\n")
+        summary_file.write("=" * 64 + "\n")
+        summary_file.write(f"Target: {target}\n")
+        summary_file.write(f"Date: {datetime.now().isoformat(sep=' ', timespec='seconds')}\n")
+        summary_file.write(f"Elapsed time: {elapsed:.2f} seconds\n")
+        summary_file.write(f"Detected OS: {detected_os}\n")
+        summary_file.write(f"Open ports: {stats['open']}\n")
+        summary_file.write(f"Closed ports: {stats['closed']}\n")
+        summary_file.write(f"Filtered ports: {stats['filtered']}\n")
+        summary_file.write(f"Skipped ports: {stats['skipped']}\n")
+        summary_file.write(f"Errors: {stats['error']}\n")
+        summary_file.write(f"Open-port list: {open_port_text}\n")
+
+
+def log_results(
+    logger: logging.Logger,
+    target: str,
+    results: Sequence[PortResult],
+    services: Mapping[int, ServiceInfo],
+    vulnerabilities: Mapping[int, Mapping[str, str]],
+) -> None:
+    for result in results:
+        service = services.get(result.port, ServiceInfo())
+        logger.info(
+            "%s | port=%d | state=%s | service=%s | product=%s | version=%s",
+            target,
+            result.port,
+            result.state,
+            service.service,
+            service.product,
+            service.version,
+        )
+        for script_name, output in vulnerabilities.get(result.port, {}).items():
+            logger.warning(
+                "%s | port=%d | script=%s | output=%s",
+                target,
+                result.port,
+                script_name,
+                output.replace("\n", " "),
+            )
+
+
+def scan_target(
+    target: str,
+    ports: Sequence[int],
+    scan_name: str,
+    options: ScanOptions,
+) -> None:
+    logger, log_path = configure_logger(target)
+    output_paths = create_output_paths(target)
+    display_target_information(target)
+
+    logger.info("Starting %s scan against %s", scan_name, target)
+    results, elapsed = run_scan(
+        target,
+        ports,
+        options.timeout,
+        options.allow_reserved_ports,
+        options.workers,
+        options.mode,
+    )
+    open_ports = get_open_ports(results)
+
+    services: Dict[int, ServiceInfo] = {}
+    if options.service_detection:
+        services = detect_services(target, open_ports)
+
+    banners: Dict[int, str] = {}
+    if options.banner_collection:
+        banners = collect_banners(target, open_ports, options.workers)
+        for port, banner in banners.items():
+            services.setdefault(port, ServiceInfo()).banner = banner
+
+    vulnerabilities: Dict[int, Dict[str, str]] = {}
+    if options.vulnerability_scan:
+        vulnerabilities = vulnerability_scan(target, open_ports)
+
+    detected_os = detect_os(target) if options.os_detection else "Not requested"
+    displayed_results = filter_results(results, options.filter_mode)
+    if displayed_results:
+        display_results(target, displayed_results, services)
     else:
-        print("\nNo security issues found.")
+        print(colourise(f"\nNo results matched '{options.filter_mode}'.", Colour.YELLOW))
 
-# Main function that orchestrates the entire scanning process
-def main():
+    if options.banner_collection:
+        display_banners(banners)
+    if options.vulnerability_scan:
+        display_vulnerabilities(vulnerabilities)
+
+    stats = scan_statistics(results)
+    display_statistics(stats)
+    open_port_text = ", ".join(map(str, open_ports)) if open_ports else "None"
+    print(f"\nElapsed time     : {elapsed:.2f} seconds")
+    print(f"Ports scanned    : {len(results)}")
+    print(f"Open port list   : {open_port_text}")
+    print(f"Detected OS      : {detected_os}")
+    print(f"Log file         : {log_path}")
+
+    log_results(logger, target, results, services, vulnerabilities)
+    logger.info("Elapsed time: %.2f seconds", elapsed)
+
+    if options.export_csv:
+        export_results_csv(output_paths["csv"], target, results, services, vulnerabilities)
+        print(colourise(f"CSV exported to: {output_paths['csv']}", Colour.GREEN))
+    if options.save_summary:
+        save_summary(output_paths["summary"], target, stats, elapsed, open_ports, detected_os)
+        print(colourise(f"Summary saved to: {output_paths['summary']}", Colour.GREEN))
+
+
+def get_scan_options() -> ScanOptions:
+    return ScanOptions(
+        timeout=get_timeout(),
+        workers=get_workers(),
+        mode=get_execution_mode(),
+        allow_reserved_ports=ask_yes_no("Allow scanning reserved ports (1-1023)?", default=True),
+        filter_mode=get_filter_mode(),
+        service_detection=ask_yes_no("Perform Nmap service/version detection?"),
+        banner_collection=ask_yes_no("Attempt passive banner collection?"),
+        vulnerability_scan=ask_yes_no("Run authorised Nmap vulnerability scripts?"),
+        os_detection=ask_yes_no("Attempt Nmap OS detection?"),
+        export_csv=ask_yes_no("Export CSV results?"),
+        save_summary=ask_yes_no("Save scan summary?"),
+    )
+
+
+def display_configuration(targets: Sequence[str], ports: Sequence[int], scan_name: str, options: ScanOptions) -> None:
+    mode_name = {"t": "Multithreading", "m": "Multiprocessing", "s": "Sequential"}[options.mode]
+    print("\n" + "=" * 64)
+    print("Scan Configuration")
+    print("=" * 64)
+    print(f"Targets              : {len(targets)}")
+    print(f"Scan type            : {scan_name}")
+    print(f"Ports requested      : {len(ports)}")
+    print(f"Execution mode       : {mode_name}")
+    print(f"Workers              : {options.workers}")
+    print(f"Timeout              : {options.timeout:.2f}s")
+    print(f"Result filter        : {options.filter_mode}")
+    print(f"Service detection    : {options.service_detection}")
+    print(f"Banner collection    : {options.banner_collection}")
+    print(f"Vulnerability scan   : {options.vulnerability_scan}")
+    print(f"OS detection         : {options.os_detection}")
+    print(f"CSV export           : {options.export_csv}")
+    print(f"Save summary         : {options.save_summary}")
+    print("=" * 64)
+
+
+def main() -> int:
     print_banner()
-
     targets = get_targets()
-    export_csv = get_output_options()
-    security_scan = get_security_scan_option()
+    ports, scan_name = get_scan_ports()
+    if ports is None or scan_name is None:
+        print("Exiting scanner.")
+        return 0
 
+    options = get_scan_options()
+    display_configuration(targets, ports, scan_name, options)
+    if not ask_yes_no("Start the scan?", default=True):
+        print("Scan cancelled.")
+        return 0
+
+    overall_started = datetime.now()
     for target in targets:
-        log_filename = f"{target}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_scan_log.txt"
-        log_filepath = os.path.join(os.path.expanduser('~'), 'Downloads', log_filename)
+        try:
+            scan_target(target, ports, scan_name, options)
+        except KeyboardInterrupt:
+            print(colourise("\nScan interrupted by the user.", Colour.YELLOW))
+            return 130
+        except Exception as error:
+            logging.exception("Unexpected error while scanning %s", target)
+            print(colourise(f"Unexpected error while scanning {target}: {error}", Colour.RED))
 
-        configure_logger(log_filepath)
+    total_elapsed = (datetime.now() - overall_started).total_seconds()
+    print("\n" + "=" * 64)
+    print(f"All scans completed in {total_elapsed:.2f} seconds.")
+    print("=" * 64)
+    return 0
 
-        print(f"\nScanning target {target}")
-        print("=" * 40)
-
-        ports_to_scan, custom_ports = get_scan_options()
-        results = []
-        filter_mode = get_filter_mode()
-        allow_reserved_ports = input("Allow scanning and identifying services on reserved ports? (y/n): ").lower() == 'y'
-
-        scan_choice = input("\nChoose scanning method (t) Multithreading / (m) Multiprocessing / (Press Enter to skip): ").lower()
-
-        if scan_choice == 't':
-            print("\nPerforming multithreaded scan...")
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                args_list = [(target, port, filter_mode, allow_reserved_ports) for port in ports_to_scan]
-                results = list(executor.map(scan_port_wrapper, args_list))
-        elif scan_choice == 'm':
-            print("\nPerforming multiprocessing scan...")
-            with concurrent.futures.ProcessPoolExecutor() as executor:
-                args_list = [(target, port, filter_mode, allow_reserved_ports) for port in ports_to_scan]
-                results = list(executor.map(scan_port_wrapper, args_list))
-        elif not scan_choice:
-            print("\nContinuing without multithreading or multiprocessing.")
-            results = [scan_port(target, port, filter_mode, allow_reserved_ports) for port in ports_to_scan]
-        else:
-            print("\nInvalid choice. Continuing without multithreading or multiprocessing.")
-
-        filtered_results = filter_ports(results, filter_mode)
-        if not filtered_results:
-            print(f"No ports with status '{filter_mode}' found.")
-        else:
-            display_scan_results(target, filtered_results)
-
-            detected_services = perform_service_detection(target, [port for port, status in filtered_results if "open" in status])
-            display_detected_services(target, detected_services)
-
-            if export_csv:
-                csv_filename = f"{target}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_scan_results.csv"
-                csv_filepath = os.path.join(os.path.expanduser('~'), 'Downloads', csv_filename)
-                save_to_file([(target, port, status) for port, status in filtered_results], csv_filepath)
-                print(f"\nScan results saved to {csv_filepath}.")
-
-            if security_scan:
-                security_issues = []
-                for port, status in filtered_results:
-                    if "open" in status:
-                        issues = check_security_issues(target, port)
-                        if issues:
-                            security_issues.extend([(port, issue) for issue in issues])
-
-                display_security_issues(target, security_issues)
-
-        print("=" * 40)
-
-    print("\nScan completed. Thank you for using the Python Port Scanner!")
 
 if __name__ == "__main__":
-    main()
+    try:
+        raise SystemExit(main())
+    except KeyboardInterrupt:
+        print(colourise("\nProgram stopped by the user.", Colour.YELLOW))
+        raise SystemExit(130)
