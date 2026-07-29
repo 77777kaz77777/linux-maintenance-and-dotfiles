@@ -8,21 +8,20 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 
 ```text
 linux-maintenance-and-dotfiles/
-├── 📁 updates/                 # Distro maintenance & update scripts
-│   ├── update.sh               # General update script
+├── 📁 updates/                  # Distro maintenance & update scripts
 │   ├── update-arch             # Arch Linux / CachyOS maintenance
 │   ├── update-Ubuntu           # Ubuntu system updates
 │   ├── Clean Mint 22.3         # Linux Mint cleanup routine
 │   ├── Cleanup Script          # Disk & system cleanup utility
 │   └── new update              # Miscellaneous update script
 │
-├── 📁 configs/                 # Terminal & CLI tool dotfiles
+├── 📁 configs/                  # Terminal & CLI tool dotfiles
 │   ├── alacritty.toml          # Alacritty terminal configuration
 │   ├── mystarshipconf.toml     # Starship prompt configuration
 │   ├── mytopgradeconf.toml     # Topgrade auto-updater configuration
 │   └── alias                   # Shell aliases & shortcuts
 │
-├── 📁 desktop-tweaks/         # UI customization & desktop scripts
+├── 📁 desktop-tweaks/          # UI customization & desktop scripts
 │   ├── blackloginscreenwallpaper.sh  # Display manager wallpaper script
 │   └── move_ubuntu_button.txt        # GNOME / Desktop layout modification guide
 │
