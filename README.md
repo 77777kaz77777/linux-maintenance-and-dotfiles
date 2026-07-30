@@ -13,7 +13,7 @@ linux-maintenance-and-dotfiles/
 │   ├── update-Ubuntu            # Ubuntu system updates
 │   ├── Clean Mint 22.3          # Linux Mint cleanup routine
 │   ├── Cleanup Script           # Disk & system cleanup utility
-│   └── new update               # Miscellaneous update script
+│   └── update-linux-mint        # Linux Mint maintenance & update script
 │
 ├── 📁 configs/                  # Terminal & CLI tool dotfiles
 │   ├── alacritty.toml          # Alacritty terminal configuration
