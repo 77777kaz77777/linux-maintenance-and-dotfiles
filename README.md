@@ -10,6 +10,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 linux-maintenance-and-dotfiles/
 ├── 📁 updates/                  # Distro maintenance & update scripts
 │   ├── update-arch              # Arch Linux / CachyOS maintenance
+│   ├── update-fedora-kde        # Fedora 44 KDE Plasma maintenance & Flatpak update script
 │   ├── update-Ubuntu            # Ubuntu system updates
 │   ├── Clean Mint 22.3          # Linux Mint cleanup routine
 │   ├── Cleanup Script           # Disk & system cleanup utility
