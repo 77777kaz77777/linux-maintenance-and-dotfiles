@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# Exit immediately if a command fails, an unset variable is referenced, or a pipe breaks
+set -euo pipefail
+
+# -----------------------------------------------------------------------------
+# Configuration
+# -----------------------------------------------------------------------------
+LOGDIR="/var/log/packageupdateslogs"
+LOGFILE="${LOGDIR}/cleanup_log.txt"
+
+# Ensure the log directory exists with safe permissions
+mkdir -p "$LOGDIR"
+chmod 755 "$LOGDIR"
+
+# Logger Function
+log_message() {
+    local TIMESTAMP
+    TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+    echo -e "[$TIMESTAMP] $1" | tee -a "$LOGFILE"
+}
+
+# -----------------------------------------------------------------------------
+# Privilege Check
+# -----------------------------------------------------------------------------
+if [[ $EUID -ne 0 ]]; then
+   echo "[ERROR] This cleanup script must be run as root or via sudo." >&2
+   exit 1
+fi
+
+log_message "=== Starting Fedora 44 KDE Plasma Debloat & Cleanup ==="
+
+# -----------------------------------------------------------------------------
+# 1. Remove KDE PIM (Personal Information Management) & Akonadi
+#    KMail, KOrganizer, KAddressBook, Kontact, etc. 
+#    (Akonadi background database takes ~200MB+ idle RAM)
+# -----------------------------------------------------------------------------
+log_message "Removing KDE PIM (KMail, KOrganizer, Kontact) and disabling Akonadi..."
+dnf remove -y \
+    akonadi* \
+    kmail* \
+    korganizer* \
+    kaddressbook* \
+    kontact* \
+    knotes* \
+    akregator* \
+    kdepim* 2>&1 | tee -a "$LOGFILE" || true
+
+# -----------------------------------------------------------------------------
+# 2. Remove Redundant Utilities, Media Players & Games
+#    Fedora installs multiple video/audio players, IRC clients, and math tools.
+# -----------------------------------------------------------------------------
+log_message "Removing unnecessary KDE desktop applications..."
+dnf remove -y \
+    dragonplayer \
+    elisa-player \
+    kmahjongg \
+    kmines \
+    ksudoku \
+    kpat \
+    konversation \
+    kmag \
+    kmousetool \
+    kwrite \
+    krdc \
+    krfb \
+    mediawriter 2>&1 | tee -a "$LOGFILE" || true
+
+# Note: 'Kate' is kept as the default text editor, while 'KWrite' is removed.
+# If you prefer a different media player (e.g. VLC/MPV via Flatpak), Elisa and Dragon are safe to drop.
+
+# -----------------------------------------------------------------------------
+# 3. Strip Unnecessary GPU Firmware (Optional for Desktop/Laptop optimization)
+#    Remove unused wireless & GPU firmware blobs if you don't have that hardware.
+# -----------------------------------------------------------------------------
+# Uncomment the section below if you are on an All-Intel or All-AMD system
+# log_message "Removing non-matching GPU firmware blobs..."
+# dnf remove -y nvidia-gpu-firmware 2>&1 | tee -a "$LOGFILE" || true # If no NVIDIA GPU
+
+# -----------------------------------------------------------------------------
+# 4. Clean DNF Packages, Orphans, and System Caches
+# -----------------------------------------------------------------------------
+log_message "Removing orphaned dependencies..."
+dnf autoremove -y 2>&1 | tee -a "$LOGFILE"
+
+log_message "Cleaning DNF5 metadata cache..."
+dnf clean all 2>&1 | tee -a "$LOGFILE"
+
+log_message "Trimming systemd journal logs (keeping last 7 days)..."
+journalctl --vacuum-time=7d 2>&1 | tee -a "$LOGFILE"
+
+# -----------------------------------------------------------------------------
+# 5. User-Level Cache Cleanup (KDE Sycoca and Thumbnail Cache)
+# -----------------------------------------------------------------------------
+TARGET_USER="${SUDO_USER:-$USER}"
+if [[ "$TARGET_USER" != "root" ]]; then
+    USER_HOME=$(eval echo "~$TARGET_USER")
+    
+    log_message "Cleaning KDE icon/sycoca cache for $TARGET_USER..."
+    rm -rf "${USER_HOME}/.cache/ksycoca"* 2>/dev/null || true
+    
+    log_message "Cleaning old image thumbnail cache..."
+    rm -rf "${USER_HOME}/.cache/thumbnails"* 2>/dev/null || true
+fi
+
+# -----------------------------------------------------------------------------
+# Completion
+# -----------------------------------------------------------------------------
+log_message "=== Cleanup completed successfully at $(date)! ==="
+echo -e "\n[DONE] System debloated! It is recommended to reboot your system to free up Akonadi background services."
