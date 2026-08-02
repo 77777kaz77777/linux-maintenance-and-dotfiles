@@ -23,7 +23,7 @@ linux-maintenance-and-dotfiles/
 │   └── secure-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
 ├── 📁 updates/                           # Distro maintenance & update scripts
 │   ├── Clean Mint 22.3                  # Linux Mint cleanup routine
-│   ├── Cleanup Script                   # Variables
+│   ├── Cleanup Script                   # Disk & system cleanup utility
 │   ├── update-Ubuntu                    # Ensure the script is run as root
 │   ├── update-arch                      # Exit immediately if a command exits with a non-zero status
 │   ├── update-fedora-kde                # Exit immediately on unhandled error, unset variable, or piped command failure
