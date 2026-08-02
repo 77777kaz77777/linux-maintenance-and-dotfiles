@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Debloat & orphan cleanup for Fedora KDE
 # Exit immediately if a command fails, an unset variable is referenced, or a pipe breaks
 set -euo pipefail
 
