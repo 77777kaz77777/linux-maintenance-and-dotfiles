@@ -15,7 +15,7 @@ linux-maintenance-and-dotfiles/
 │   ├── mystarshipconf.toml              # Starship prompt configuration
 │   └── mytopgradeconf.toml              # Topgrade auto-updater configuration
 ├── 📁 desktop-tweaks/                    # UI customization & desktop scripts
-│   ├── blackloginscreenwallpaper.sh     # Ensure the script is run with sudo
+│   ├── blackloginscreenwallpaper.sh     # Display manager wallpaper script
 │   └── move_ubuntu_button.txt
 ├── 📁 security/                          # Antivirus & system defense utilities
 │   ├── ClamAV Signature Update          # Ensure the script is run with root privileges
