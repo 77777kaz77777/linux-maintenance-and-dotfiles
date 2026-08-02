@@ -1,3 +1,5 @@
+ # Starship prompt configuration
+
 # Two-Line High-Contrast Bash Formatting
 # Line 1: Shows your exact, full directory path starting from the left
 # Line 2: Drops down to give you a clean, dedicated input field
