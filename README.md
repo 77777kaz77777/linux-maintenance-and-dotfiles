@@ -34,7 +34,7 @@ linux-maintenance-and-dotfiles/
     ├── create_bash_file.sh              # Script generator template
     ├── osi_sec_overview                 # Custom utility tool: OSI Layer Security Overview
     ├── portscanner.py                   # Python port scanner
-    ├── toggle-tailscale.sh              # A interactive utility to easily toggle Tailscale on and off, with an optional prompt to route all traffic through a specific exit node
+    ├── toggle-tailscale.sh              # # Tailscale toggle script with exit node prompt
     └── vpn                              # Network/VPN manager script
 ```
 <!-- END_SECTION:tree -->
