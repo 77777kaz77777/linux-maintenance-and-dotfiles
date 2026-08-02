@@ -18,7 +18,7 @@ linux-maintenance-and-dotfiles/
 │   ├── blackloginscreenwallpaper.sh     # Display manager wallpaper script
 │   └── move_ubuntu_button.txt           # GNOME / Desktop layout modification guide
 ├── 📁 security/                          # Antivirus & system defense utilities
-│   ├── ClamAV Signature Update          # Ensure the script is run with root privileges
+│   ├── ClamAV Signature Update          # Antivirus database updater
 │   ├── clamav                           # Complete ClamAV Setup & Automation Guide
 │   └── secure-cachyos.sh                # ==============================================================================
 ├── 📁 updates/                           # Distro maintenance & update scripts
