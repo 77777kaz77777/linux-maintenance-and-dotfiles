@@ -19,7 +19,7 @@ linux-maintenance-and-dotfiles/
 │   └── move_ubuntu_button.txt           # GNOME / Desktop layout modification guide
 ├── 📁 security/                          # Antivirus & system defense utilities
 │   ├── ClamAV Signature Update          # Antivirus database updater
-│   ├── clamav                           # Complete ClamAV Setup & Automation Guide
+│   ├── clamav                           # ClamAV scanner integration
 │   └── secure-cachyos.sh                # ==============================================================================
 ├── 📁 updates/                           # Distro maintenance & update scripts
 │   ├── Clean Mint 22.3                  # Ensure we are running with sudo
