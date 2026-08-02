@@ -29,7 +29,7 @@ linux-maintenance-and-dotfiles/
 │   ├── update-fedora-kde                # Fedora 44 KDE Plasma maintenance & update
 │   ├── update-fedora-kde-clean          # Debloat & orphan cleanup for Fedora KDE
 │   ├── update-fedora-kde-maintenance    # Fedora 44 KDE Plasma full system maintenance, cache, and cleanup script
-│   └── update-linux-mint                # Exit immediately if a command exits with a non-zero status
+│   └── update-linux-mint                # Linux Mint maintenance & update script
 └── 📁 utils/                             # General standalone helper scripts
     ├── create_bash_file.sh              # Get the desired filename from the user
     ├── improved osi                     # Display OSI Model Layers and Corresponding Protocols and Attacks
