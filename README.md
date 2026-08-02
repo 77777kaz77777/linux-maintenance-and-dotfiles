@@ -25,7 +25,7 @@ linux-maintenance-and-dotfiles/
 │   ├── Clean Mint 22.3                  # Linux Mint cleanup routine
 │   ├── Cleanup Script                   # Disk & system cleanup utility
 │   ├── update-Ubuntu                    # Ubuntu system updates
-│   ├── update-arch                      # Exit immediately if a command exits with a non-zero status
+│   ├── update-arch                      # Arch Linux / CachyOS maintenance
 │   ├── update-fedora-kde                # Exit immediately on unhandled error, unset variable, or piped command failure
 │   ├── update-fedora-kde-clean          # Exit immediately if a command fails, an unset variable is referenced, or a pipe breaks
 │   ├── update-fedora-kde-maintenance    # Fedora 44 KDE Plasma full system maintenance, cache, and cleanup script
