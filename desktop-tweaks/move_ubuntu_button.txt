@@ -1,3 +1,5 @@
+# GNOME / Desktop layout modification guide
+
 ============================================================
 HOW TO MOVE THE UBUNTU "SHOW APPLICATIONS" BUTTON (9-DOTS)
 System: Ubuntu 24.04 LTS
