@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Network/VPN manager script
 # Get the desired filename from the user
 read -p "Enter the desired filename (without .sh extension): " filename
 
