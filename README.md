@@ -33,7 +33,7 @@ linux-maintenance-and-dotfiles/
 └── 📁 utils/                             # General standalone helper scripts
     ├── create_bash_file.sh              # Script generator template
     ├── improved osi                     # Custom utility tool
-    ├── ps.py                            # Python port scanner
+    ├── portscanner.py                   # Python port scanner
     └── vpn                              # Network/VPN manager script
 ```
 <!-- END_SECTION:tree -->
