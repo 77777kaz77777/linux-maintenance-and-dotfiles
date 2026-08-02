@@ -22,7 +22,7 @@ linux-maintenance-and-dotfiles/
 │   ├── clamav                           # ClamAV scanner integration
 │   └── secure-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
 ├── 📁 updates/                           # Distro maintenance & update scripts
-│   ├── Clean Mint 22.3                  # Ensure we are running with sudo
+│   ├── Clean Mint 22.3                  # Linux Mint cleanup routine
 │   ├── Cleanup Script                   # Variables
 │   ├── update-Ubuntu                    # Ensure the script is run as root
 │   ├── update-arch                      # Exit immediately if a command exits with a non-zero status
