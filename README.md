@@ -20,7 +20,7 @@ linux-maintenance-and-dotfiles/
 ├── 📁 security/                          # Antivirus & system defense utilities
 │   ├── ClamAV Signature Update          # Antivirus database updater
 │   ├── clamav                           # ClamAV scanner integration
-│   └── secure-cachyos.sh                # ==============================================================================
+│   └── secure-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
 ├── 📁 updates/                           # Distro maintenance & update scripts
 │   ├── Clean Mint 22.3                  # Ensure we are running with sudo
 │   ├── Cleanup Script                   # Variables
