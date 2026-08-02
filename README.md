@@ -6,6 +6,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 
 ## 🌳 Repository Structure
 
+<!-- START_SECTION:tree -->
 ```text
 linux-maintenance-and-dotfiles/
 ├── 📁 updates/                  # Distro maintenance & update scripts
