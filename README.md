@@ -10,7 +10,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 ```text
 linux-maintenance-and-dotfiles/
 ├── 📁 configs/                           # Terminal & CLI tool dotfiles
-│   ├── alacritty.toml                   # =====================================================================
+│   ├── alacritty.toml                   # Alacritty terminal configuration
 │   ├── alias                            # enable color support of ls and also add handy aliases
 │   ├── mystarshipconf.toml              # Two-Line High-Contrast Bash Formatting
 │   └── mytopgradeconf.toml              # Include any additional configuration file(s)
