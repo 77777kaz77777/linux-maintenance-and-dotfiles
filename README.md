@@ -12,7 +12,7 @@ linux-maintenance-and-dotfiles/
 ├── 📁 configs/                           # Terminal & CLI tool dotfiles
 │   ├── alacritty.toml                   # Alacritty terminal configuration
 │   ├── alias                            # Shell aliases & shortcuts
-│   ├── mystarshipconf.toml              # Two-Line High-Contrast Bash Formatting
+│   ├── mystarshipconf.toml              # Starship prompt configuration
 │   └── mytopgradeconf.toml              # Include any additional configuration file(s)
 ├── 📁 desktop-tweaks/                    # UI customization & desktop scripts
 │   ├── blackloginscreenwallpaper.sh     # Ensure the script is run with sudo
