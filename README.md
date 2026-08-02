@@ -13,7 +13,7 @@ linux-maintenance-and-dotfiles/
 │   ├── alacritty.toml                   # Alacritty terminal configuration
 │   ├── alias                            # Shell aliases & shortcuts
 │   ├── mystarshipconf.toml              # Starship prompt configuration
-│   └── mytopgradeconf.toml              # Include any additional configuration file(s)
+│   └── mytopgradeconf.toml              # Topgrade auto-updater configuration
 ├── 📁 desktop-tweaks/                    # UI customization & desktop scripts
 │   ├── blackloginscreenwallpaper.sh     # Ensure the script is run with sudo
 │   └── move_ubuntu_button.txt
