@@ -34,6 +34,6 @@ linux-maintenance-and-dotfiles/
     ├── create_bash_file.sh              # Script generator template
     ├── improved osi                     # Custom utility tool
     ├── ps.py
-    └── vpn                              # Define the configuration file path
+    └── vpn                              # Network/VPN manager script
 ```
 <!-- END_SECTION:tree -->
