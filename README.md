@@ -16,7 +16,7 @@ linux-maintenance-and-dotfiles/
 │   └── mytopgradeconf.toml              # Topgrade auto-updater configuration
 ├── 📁 desktop-tweaks/                    # UI customization & desktop scripts
 │   ├── blackloginscreenwallpaper.sh     # Display manager wallpaper script
-│   └── move_ubuntu_button.txt
+│   └── move_ubuntu_button.txt           # GNOME / Desktop layout modification guide
 ├── 📁 security/                          # Antivirus & system defense utilities
 │   ├── ClamAV Signature Update          # Ensure the script is run with root privileges
 │   ├── clamav                           # Complete ClamAV Setup & Automation Guide
