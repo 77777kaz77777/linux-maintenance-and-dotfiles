@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Custom utility tool
 # Display OSI Model Layers and Corresponding Protocols and Attacks
 cat << EOF
 The OSI (Open Systems Interconnection) model is a conceptual framework used to understand and implement networking protocols. Below is a fact-checked and improved version of the table:
