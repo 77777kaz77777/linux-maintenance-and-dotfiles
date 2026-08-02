@@ -27,7 +27,7 @@ linux-maintenance-and-dotfiles/
 │   ├── update-Ubuntu                    # Ubuntu system updates
 │   ├── update-arch                      # Arch Linux / CachyOS maintenance
 │   ├── update-fedora-kde                # Fedora 44 KDE Plasma maintenance & update
-│   ├── update-fedora-kde-clean          # Exit immediately if a command fails, an unset variable is referenced, or a pipe breaks
+│   ├── update-fedora-kde-clean          # Debloat & orphan cleanup for Fedora KDE
 │   ├── update-fedora-kde-maintenance    # Fedora 44 KDE Plasma full system maintenance, cache, and cleanup script
 │   └── update-linux-mint                # Exit immediately if a command exits with a non-zero status
 └── 📁 utils/                             # General standalone helper scripts
