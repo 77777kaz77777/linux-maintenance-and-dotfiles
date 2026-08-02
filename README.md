@@ -38,3 +38,4 @@ linux-maintenance-and-dotfiles/
     ├── ps.py                    # Process monitoring Python utility
     ├── create_bash_file.sh      # Script generator template
     └── improved osi             # Custom utility tool
+<!-- END_SECTION:tree -->
