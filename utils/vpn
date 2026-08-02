@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ # Network/VPN manager script
 # Define the configuration file path
 CONFIG_FILE="$HOME/Downloads/otherlaptop.conf"
 
