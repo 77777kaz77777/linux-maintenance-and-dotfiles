@@ -1,4 +1,5 @@
 #!/bin/bash
+ # Antivirus database updater
 
 # Ensure the script is run with root privileges
 if [ "$EUID" -ne 0 ]; then
