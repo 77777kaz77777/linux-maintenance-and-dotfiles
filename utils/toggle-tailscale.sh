@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# A interactive utility to easily toggle Tailscale on and off, with an optional prompt to route all traffic through a specific exit node
+# # Tailscale toggle script with exit node prompt
 # Exit node domain
 EXIT_NODE="yourdomain"
 
