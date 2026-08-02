@@ -31,7 +31,7 @@ linux-maintenance-and-dotfiles/
 │   ├── update-fedora-kde-maintenance    # Fedora 44 KDE Plasma full system maintenance, cache, and cleanup script
 │   └── update-linux-mint                # Linux Mint maintenance & update script
 └── 📁 utils/                             # General standalone helper scripts
-    ├── create_bash_file.sh              # Network/VPN manager script
+    ├── create_bash_file.sh              # Script generator template
     ├── improved osi                     # Custom utility tool
     ├── ps.py
     └── vpn                              # Define the configuration file path
