@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Fedora 44 KDE Plasma maintenance & update 
 # Exit immediately on unhandled error, unset variable, or piped command failure
 set -euo pipefail
 
