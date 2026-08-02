@@ -6,7 +6,7 @@ import csv
 import nmap 
 from datetime import datetime
 import ipaddress
-
+# Python port scanner
 # Commonly used ports for quick scans
 COMMON_PORTS = [80, 443, 22, 21, 25]
 
