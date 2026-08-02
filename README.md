@@ -32,7 +32,7 @@ linux-maintenance-and-dotfiles/
 │   └── update-linux-mint                # Linux Mint maintenance & update script
 └── 📁 utils/                             # General standalone helper scripts
     ├── create_bash_file.sh              # Script generator template
-    ├── improved osi                     # Custom utility tool
+    ├── osi_sec_overview                 # Custom utility tool: OSI Layer Security Overview
     ├── portscanner.py                   # Python port scanner
     └── vpn                              # Network/VPN manager script
 ```
