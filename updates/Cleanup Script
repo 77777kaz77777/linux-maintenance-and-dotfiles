@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Disk & system cleanup utility
 # Variables
 TEMP_DIR="/tmp"
 LOG_DIR="/var/log"
