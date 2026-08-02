@@ -1,4 +1,5 @@
 #!/bin/bash
+# Display manager wallpaper script
 
 # Ensure the script is run with sudo
 if [ "$EUID" -ne 0 ]; then 
