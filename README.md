@@ -32,7 +32,7 @@ linux-maintenance-and-dotfiles/
 │   └── update-linux-mint                # Linux Mint maintenance & update script
 └── 📁 utils/                             # General standalone helper scripts
     ├── create_bash_file.sh              # Network/VPN manager script
-    ├── improved osi                     # Display OSI Model Layers and Corresponding Protocols and Attacks
+    ├── improved osi                     # Custom utility tool
     ├── ps.py
     └── vpn                              # Define the configuration file path
 ```
