@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script Name: update-fedora.sh
+# Description: Automated maintenance & upgrade script for Fedora (KDE / Workstation)
 
 # Exit immediately on unhandled error, unset variable, or piped command failure
 set -euo pipefail
