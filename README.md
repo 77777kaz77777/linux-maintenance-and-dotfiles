@@ -21,7 +21,7 @@ linux-maintenance-and-dotfiles/
 │   ├── clamav-nightly-scan.sh           # Nightly multi-threaded scan script
 │   ├── clamav-scan.service              # Systemd service unit executing the nightly scan
 │   ├── clamav-scan.timer                # Systemd timer unit scheduling scans at 2:00 AM
-│   ├── run-clamav-scan.sh
+│   ├── run-clamav-scan.sh               # Manual on-demand ClamAV terminal scanner
 │   ├── secure-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
 │   └── update-clamav-signatures.sh      # Antivirus database updater
 ├── 📁 updates/                           # Distro maintenance & update scripts
