@@ -26,9 +26,9 @@ linux-maintenance-and-dotfiles/
 │   └── update-clamav-signatures.sh      # Manual Freshclam signature updater script
 ├── 📁 updates/                           # Distro maintenance & update scripts
 │   ├── clean-mint.sh                    # Linux Mint package & cache cleanup routine
+│   ├── debloat-fedora-kde.sh            # Removes Akonadi/PIM bloat, extra media tools, and cleans caches.
 │   ├── system-cleanup.sh                # Safely cleans temporary files and old system logs.
 │   ├── update-arch.sh                   # Maintenance & update script for Arch Linux / CachyOS
-│   ├── update-fedora-kde-clean          # Debloat & orphan cleanup for Fedora KDE
 │   ├── update-fedora-kde-maintenance    # Fedora 44 KDE Plasma full system maintenance, cache, and cleanup script
 │   ├── update-fedora.sh                 # Script Name: update-fedora.sh
 │   ├── update-linux-mint                # Linux Mint maintenance & update script
