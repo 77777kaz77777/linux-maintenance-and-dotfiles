@@ -28,7 +28,7 @@ linux-maintenance-and-dotfiles/
 │   ├── clean-mint.sh                    # Linux Mint package & cache cleanup routine
 │   ├── system-cleanup.sh                # Safely cleans temporary files and old system logs.
 │   ├── update-Ubuntu                    # Ubuntu system updates
-│   ├── update-arch                      # Arch Linux / CachyOS maintenance
+│   ├── update-arch.sh                   # Maintenance & update script for Arch Linux / CachyOS
 │   ├── update-fedora-kde                # Fedora 44 KDE Plasma maintenance & update
 │   ├── update-fedora-kde-clean          # Debloat & orphan cleanup for Fedora KDE
 │   ├── update-fedora-kde-maintenance    # Fedora 44 KDE Plasma full system maintenance, cache, and cleanup script
