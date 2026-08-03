@@ -11,7 +11,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 linux-maintenance-and-dotfiles/
 ├── 📁 configs/                           # Terminal & CLI tool dotfiles
 │   ├── alacritty.toml                   # Alacritty terminal configuration
-│   ├── alias                            # Shell aliases & shortcuts
+│   ├── bash-aliases                     # Shell aliases & shortcuts
 │   ├── mystarshipconf.toml              # Starship prompt configuration
 │   └── mytopgradeconf.toml              # Topgrade auto-updater configuration
 ├── 📁 desktop-tweaks/                    # UI customization & desktop scripts
