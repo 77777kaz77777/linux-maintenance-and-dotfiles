@@ -31,7 +31,7 @@ linux-maintenance-and-dotfiles/
 │   ├── update-arch.sh                  # Maintenance & update script for Arch Linux / CachyOS
 │   ├── update-fedora-maintenance.sh    # Full system maintenance, DNF/Flatpak updates, and cache cleanup.
 │   ├── update-fedora.sh                # Script Name: update-fedora.sh
-│   ├── update-linux-mint               # Linux Mint maintenance & update script
+│   ├── update-mint.sh                  # Automated APT, Flatpak, and system cleanup script for Linux Mint.
 │   └── update-ubuntu.sh                # Automated system update & maintenance script for Ubuntu / Debian
 └── 📁 utils/                            # General standalone helper scripts
     ├── create_bash_file.sh             # Script generator template
