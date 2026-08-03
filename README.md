@@ -27,12 +27,12 @@ linux-maintenance-and-dotfiles/
 ├── 📁 updates/                           # Distro maintenance & update scripts
 │   ├── clean-mint.sh                    # Linux Mint package & cache cleanup routine
 │   ├── system-cleanup.sh                # Safely cleans temporary files and old system logs.
-│   ├── update-Ubuntu                    # Ubuntu system updates
 │   ├── update-arch.sh                   # Maintenance & update script for Arch Linux / CachyOS
 │   ├── update-fedora-kde                # Fedora 44 KDE Plasma maintenance & update
 │   ├── update-fedora-kde-clean          # Debloat & orphan cleanup for Fedora KDE
 │   ├── update-fedora-kde-maintenance    # Fedora 44 KDE Plasma full system maintenance, cache, and cleanup script
-│   └── update-linux-mint                # Linux Mint maintenance & update script
+│   ├── update-linux-mint                # Linux Mint maintenance & update script
+│   └── update-ubuntu.sh                 # Automated system update & maintenance script for Ubuntu / Debian
 └── 📁 utils/                             # General standalone helper scripts
     ├── create_bash_file.sh              # Script generator template
     ├── osi_sec_overview                 # Custom utility tool: OSI Layer Security Overview
