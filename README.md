@@ -18,7 +18,7 @@ linux-maintenance-and-dotfiles/
 │   ├── docs
 │   └── set-login-wallpaper.sh           # Display manager wallpaper script
 ├── 📁 security/                          # Antivirus & system defense utilities
-│   ├── clamav-nightly-scan.sh           # Create log folder if missing
+│   ├── clamav-nightly-scan.sh           # Nightly multi-threaded scan script
 │   ├── clamav-scan.service
 │   ├── clamav-scan.timer
 │   ├── run-clamav-scan.sh
