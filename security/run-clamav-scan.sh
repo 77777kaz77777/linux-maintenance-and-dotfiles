@@ -1,3 +1,4 @@
+# Manual on-demand ClamAV terminal scanner
 #!/bin/bash
 echo "========================================="
 echo "    Starting Manual ClamAV System Scan   "
