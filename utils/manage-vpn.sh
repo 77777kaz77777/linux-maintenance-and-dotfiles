@@ -1,7 +1,7 @@
 #!/bin/bash
- # Network/VPN manager script
+# WireGuard connection toggle (WG-Quick UP/DOWN)
 # Define the configuration file path
-CONFIG_FILE="$HOME/Downloads/otherlaptop.conf"
+CONFIG_FILE="$HOME/#####/#####"
 
 # Function to bring the interface up
 turn_on() {
