@@ -1,3 +1,4 @@
+# Systemd service unit executing the nightly scan
 [Unit]
 Description=Trigger multi-threaded ClamAV system scan
 After=clamav-daemon.service
