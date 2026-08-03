@@ -1,5 +1,6 @@
 #!/bin/bash
-# Fedora 44 KDE Plasma maintenance & update 
+# Script Name: update-fedora.sh
+
 # Exit immediately on unhandled error, unset variable, or piped command failure
 set -euo pipefail
 
@@ -7,12 +8,15 @@ set -euo pipefail
 # Configuration
 # -----------------------------------------------------------------------------
 LOGDIR="/var/log/packageupdateslogs"
-LOGFILE="${LOGDIR}/update_log.txt"
+LOGFILE="${LOGDIR}/update_fedora.log"
 MAX_LOG_SIZE_KB=5000  # Rotate log if it exceeds ~5MB
 
-# Identify the active desktop user (for desktop notifications and user flatpaks)
+# Identify active desktop user (for desktop notifications and user flatpaks)
 TARGET_USER="${SUDO_USER:-$USER}"
 TARGET_UID=$(id -u "$TARGET_USER" 2>/dev/null || echo 1000)
+
+# Fetch OS release details dynamically
+FEDORA_VERSION=$(grep -oP '(?<=^VERSION_ID=).*' /etc/os-release | tr -d '"' 2>/dev/null || echo "Fedora")
 
 # -----------------------------------------------------------------------------
 # Helpers
@@ -29,24 +33,23 @@ chmod 755 "$LOGDIR"
 
 # Simple Log Rotation
 if [[ -f "$LOGFILE" ]] && [[ $(du -k "$LOGFILE" | cut -f1) -ge $MAX_LOG_SIZE_KB ]]; then
-    mv "$LOGFILE" "${LOGFILE}.bak.$(date +%Y%m%d%H%M%S)"
-    touch "$LOGFILE"
+   mv "$LOGFILE" "${LOGFILE}.bak.$(date +%Y%m%d%H%M%S)"
+   touch "$LOGFILE"
 fi
 
-# Function to write timestamped output to terminal and log file
+# Write timestamped output to terminal and log file
 log_message() {
     local TIMESTAMP
     TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
     echo -e "[$TIMESTAMP] $1" | tee -a "$LOGFILE"
 }
 
-# Function to trigger KDE / Desktop Notifications
+# Trigger Desktop Notifications
 send_notification() {
     local TITLE="$1"
     local BODY="$2"
     local URGENCY="${3:-normal}" # low, normal, critical
     
-    # Send desktop notification using DBUS context of the logged-in user
     if command -v notify-send &>/dev/null && [[ "$TARGET_USER" != "root" ]]; then
         sudo -u "$TARGET_USER" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/${TARGET_UID}/bus" \
             notify-send -u "$URGENCY" -a "System Updater" "$TITLE" "$BODY" || true
@@ -64,14 +67,14 @@ trap trap_failure ERR
 # Main Maintenance Routine
 # -----------------------------------------------------------------------------
 log_message "=================================================="
-log_message "Starting Fedora 44 KDE Maintenance Task"
+log_message "Starting System Maintenance (Fedora $FEDORA_VERSION)"
 log_message "Running on behalf of user: $TARGET_USER"
 log_message "=================================================="
 
-send_notification "System Maintenance Started" "Updating system packages and Flatpaks..." "low"
+send_notification "System Maintenance Started" "Updating packages and Flatpaks..." "low"
 
-# 1. Update Fedora RPM Packages (DNF5)
-log_message "Refreshing RPM repositories and upgrading system packages..."
+# 1. Update Fedora RPM Packages (DNF / DNF5)
+log_message "Refreshing RPM repositories and upgrading packages..."
 dnf upgrade --refresh -y 2>&1 | tee -a "$LOGFILE"
 
 # 2. Package Cleanup & Orphan Removal
@@ -87,7 +90,7 @@ if command -v flatpak &>/dev/null; then
     log_message "Cleaning unused Flatpak runtimes..."
     flatpak uninstall --unused -y 2>&1 | tee -a "$LOGFILE"
 
-    # Update User-level Flatpaks if a non-root user executed sudo
+    # Update User-level Flatpaks if executed via sudo
     if [[ "$TARGET_USER" != "root" ]]; then
         log_message "Updating User Flatpaks for $TARGET_USER..."
         sudo -u "$TARGET_USER" flatpak update -y 2>&1 | tee -a "$LOGFILE" || true
@@ -98,16 +101,17 @@ fi
 if command -v fwupdmgr &>/dev/null; then
     log_message "Checking for Hardware Firmware Updates..."
     fwupdmgr refresh --quiet 2>&1 | tee -a "$LOGFILE" || true
-    # Fetch updates silently without forcing installation (prompts require interactive input on critical devices)
     fwupdmgr get-updates 2>&1 | tee -a "$LOGFILE" || true
 fi
 
 # 5. Optional KDE Plasma Cache Cleanup
 if [[ "$TARGET_USER" != "root" ]]; then
-    USER_HOME=$(eval echo "~$TARGET_USER")
-    if [[ -d "${USER_HOME}/.cache/ksycoca5" || -d "${USER_HOME}/.cache/ksycoca6" ]]; then
-        log_message "Cleaning KDE System Configuration Cache..."
-        rm -rf "${USER_HOME}/.cache/ksycoca"* 2>/dev/null || true
+    USER_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6)
+    if [[ -n "$USER_HOME" && -d "$USER_HOME" ]]; then
+        if ls "${USER_HOME}/.cache/ksycoca"* 1>/dev/null 2>&1; then
+            log_message "Cleaning KDE System Configuration Cache..."
+            rm -rf "${USER_HOME}/.cache/ksycoca"* 2>/dev/null || true
+        fi
     fi
 fi
 
@@ -115,7 +119,7 @@ fi
 # Completion
 # -----------------------------------------------------------------------------
 log_message "All updates completed successfully at $(date)!"
-send_notification "System Maintenance Complete" "Your Fedora 44 KDE system is fully up to date." "normal"
+send_notification "System Maintenance Complete" "Your Fedora system is fully up to date." "normal"
 
 # Clear error trap prior to successful exit
 trap - ERR
