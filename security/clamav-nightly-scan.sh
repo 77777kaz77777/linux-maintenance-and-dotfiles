@@ -1,3 +1,4 @@
+# Nightly multi-threaded scan script
 #!/bin/bash
 LOGFILE="/var/log/clamav/daily_scan.log"
 
