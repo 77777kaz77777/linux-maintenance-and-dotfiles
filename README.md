@@ -19,6 +19,7 @@ linux-maintenance-and-dotfiles/
 │   └── set-login-wallpaper.sh           # Display manager wallpaper script
 ├── 📁 security/                          # Antivirus & system defense utilities
 │   ├── clamav-nightly-scan.sh           # Create log folder if missing
+│   ├── run-clamav-scan.sh
 │   ├── secure-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
 │   └── update-clamav-signatures.sh      # Antivirus database updater
 ├── 📁 updates/                           # Distro maintenance & update scripts
