@@ -19,7 +19,7 @@ linux-maintenance-and-dotfiles/
 │   └── set-login-wallpaper.sh           # Display manager wallpaper script
 ├── 📁 security/                          # Antivirus & system defense utilities
 │   ├── clamav-nightly-scan.sh           # Nightly multi-threaded scan script
-│   ├── clamav-scan.service
+│   ├── clamav-scan.service              # Systemd service unit executing the nightly scan
 │   ├── clamav-scan.timer
 │   ├── run-clamav-scan.sh
 │   ├── secure-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
