@@ -9,35 +9,35 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 <!-- START_SECTION:tree -->
 ```text
 linux-maintenance-and-dotfiles/
-├── 📁 configs/                           # Terminal & CLI tool dotfiles
-│   ├── alacritty.toml                   # Alacritty terminal configuration
-│   ├── bash-aliases                     # Shell aliases & shortcuts
-│   ├── starship.toml                    # Starship prompt configuration
-│   └── topgrade.toml                    # Topgrade auto-updater configuration
-├── 📁 desktop-tweaks/                    # UI customization & desktop scripts
+├── 📁 configs/                          # Terminal & CLI tool dotfiles
+│   ├── alacritty.toml                  # Alacritty terminal configuration
+│   ├── bash-aliases                    # Shell aliases & shortcuts
+│   ├── starship.toml                   # Starship prompt configuration
+│   └── topgrade.toml                   # Topgrade auto-updater configuration
+├── 📁 desktop-tweaks/                   # UI customization & desktop scripts
 │   ├── docs
-│   └── set-login-wallpaper.sh           # Display manager wallpaper script
-├── 📁 security/                          # Antivirus & system defense utilities
-│   ├── clamav-nightly-scan.sh           # Nightly multi-threaded scan script
-│   ├── clamav-scan.service              # Systemd service unit executing the nightly scan
-│   ├── clamav-scan.timer                # Systemd timer unit scheduling scans at 2:00 AM
-│   ├── harden-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
-│   ├── run-clamav-scan.sh               # Manual on-demand ClamAV terminal scanner
-│   └── update-clamav-signatures.sh      # Manual Freshclam signature updater script
-├── 📁 updates/                           # Distro maintenance & update scripts
-│   ├── clean-mint.sh                    # Linux Mint package & cache cleanup routine
-│   ├── debloat-fedora-kde.sh            # Removes Akonadi/PIM bloat, extra media tools, and cleans caches.
-│   ├── system-cleanup.sh                # Safely cleans temporary files and old system logs.
-│   ├── update-arch.sh                   # Maintenance & update script for Arch Linux / CachyOS
-│   ├── update-fedora-kde-maintenance    # Fedora 44 KDE Plasma full system maintenance, cache, and cleanup script
-│   ├── update-fedora.sh                 # Script Name: update-fedora.sh
-│   ├── update-linux-mint                # Linux Mint maintenance & update script
-│   └── update-ubuntu.sh                 # Automated system update & maintenance script for Ubuntu / Debian
-└── 📁 utils/                             # General standalone helper scripts
-    ├── create_bash_file.sh              # Script generator template
-    ├── osi_sec_overview                 # Custom utility tool: OSI Layer Security Overview
-    ├── portscanner.py                   # Python port scanner
-    ├── toggle-tailscale.sh              # # Tailscale toggle script with exit node prompt
-    └── vpn                              # Network/VPN manager script
+│   └── set-login-wallpaper.sh          # Display manager wallpaper script
+├── 📁 security/                         # Antivirus & system defense utilities
+│   ├── clamav-nightly-scan.sh          # Nightly multi-threaded scan script
+│   ├── clamav-scan.service             # Systemd service unit executing the nightly scan
+│   ├── clamav-scan.timer               # Systemd timer unit scheduling scans at 2:00 AM
+│   ├── harden-cachyos.sh               # CachyOS firewall, AppArmor & sysctl hardening
+│   ├── run-clamav-scan.sh              # Manual on-demand ClamAV terminal scanner
+│   └── update-clamav-signatures.sh     # Manual Freshclam signature updater script
+├── 📁 updates/                          # Distro maintenance & update scripts
+│   ├── clean-mint.sh                   # Linux Mint package & cache cleanup routine
+│   ├── debloat-fedora-kde.sh           # Removes Akonadi/PIM bloat, extra media tools, and cleans caches.
+│   ├── system-cleanup.sh               # Safely cleans temporary files and old system logs.
+│   ├── update-arch.sh                  # Maintenance & update script for Arch Linux / CachyOS
+│   ├── update-fedora-maintenance.sh    # Full system maintenance, DNF/Flatpak updates, and cache cleanup.
+│   ├── update-fedora.sh                # Script Name: update-fedora.sh
+│   ├── update-linux-mint               # Linux Mint maintenance & update script
+│   └── update-ubuntu.sh                # Automated system update & maintenance script for Ubuntu / Debian
+└── 📁 utils/                            # General standalone helper scripts
+    ├── create_bash_file.sh             # Script generator template
+    ├── osi_sec_overview                # Custom utility tool: OSI Layer Security Overview
+    ├── portscanner.py                  # Python port scanner
+    ├── toggle-tailscale.sh             # # Tailscale toggle script with exit node prompt
+    └── vpn                             # Network/VPN manager script
 ```
 <!-- END_SECTION:tree -->
