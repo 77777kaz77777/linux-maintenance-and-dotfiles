@@ -1,5 +1,5 @@
 #!/bin/bash
- # Antivirus database updater
+# Manual Freshclam signature updater script
 
 # Ensure the script is run with root privileges
 if [ "$EUID" -ne 0 ]; then
