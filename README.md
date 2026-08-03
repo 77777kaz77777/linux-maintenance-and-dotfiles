@@ -25,8 +25,8 @@ linux-maintenance-and-dotfiles/
 │   ├── run-clamav-scan.sh               # Manual on-demand ClamAV terminal scanner
 │   └── update-clamav-signatures.sh      # Manual Freshclam signature updater script
 ├── 📁 updates/                           # Distro maintenance & update scripts
-│   ├── Cleanup Script                   # Disk & system cleanup utility
 │   ├── clean-mint.sh                    # Linux Mint package & cache cleanup routine
+│   ├── system-cleanup.sh                # Safely cleans temporary files and old system logs.
 │   ├── update-Ubuntu                    # Ubuntu system updates
 │   ├── update-arch                      # Arch Linux / CachyOS maintenance
 │   ├── update-fedora-kde                # Fedora 44 KDE Plasma maintenance & update
