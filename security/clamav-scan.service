@@ -1,0 +1,7 @@
+[Unit]
+Description=Trigger multi-threaded ClamAV system scan
+After=clamav-daemon.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/clamav-nightly-scan.sh
