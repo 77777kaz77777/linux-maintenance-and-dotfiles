@@ -18,9 +18,9 @@ linux-maintenance-and-dotfiles/
 │   ├── docs
 │   └── set-login-wallpaper.sh           # Display manager wallpaper script
 ├── 📁 security/                          # Antivirus & system defense utilities
-│   ├── ClamAV Signature Update          # Antivirus database updater
 │   ├── clamav                           # ClamAV scanner integration
-│   └── secure-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
+│   ├── secure-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
+│   └── update-clamav-signatures.sh      # Antivirus database updater
 ├── 📁 updates/                           # Distro maintenance & update scripts
 │   ├── Clean Mint 22.3                  # Linux Mint cleanup routine
 │   ├── Cleanup Script                   # Disk & system cleanup utility
