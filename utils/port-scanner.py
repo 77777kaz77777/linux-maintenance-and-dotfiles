@@ -1,5 +1,4 @@
-# Python port scanner
-
+# Educational multi-threaded TCP socket scanner (College Project)
 import os
 import socket
 import concurrent.futures
