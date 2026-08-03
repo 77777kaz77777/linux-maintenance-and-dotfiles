@@ -12,8 +12,8 @@ linux-maintenance-and-dotfiles/
 ├── 📁 configs/                           # Terminal & CLI tool dotfiles
 │   ├── alacritty.toml                   # Alacritty terminal configuration
 │   ├── bash-aliases                     # Shell aliases & shortcuts
-│   ├── mystarshipconf.toml              # Starship prompt configuration
-│   └── mytopgradeconf.toml              # Topgrade auto-updater configuration
+│   ├── mytopgradeconf.toml              # Topgrade auto-updater configuration
+│   └── starship.toml                    # Starship prompt configuration
 ├── 📁 desktop-tweaks/                    # UI customization & desktop scripts
 │   ├── blackloginscreenwallpaper.sh     # Display manager wallpaper script
 │   └── move_ubuntu_button.txt           # GNOME / Desktop layout modification guide
