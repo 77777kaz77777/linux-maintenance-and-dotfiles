@@ -34,7 +34,7 @@ linux-maintenance-and-dotfiles/
 │   ├── update-mint.sh                  # Automated APT, Flatpak, and system cleanup script for Linux Mint.
 │   └── update-ubuntu.sh                # Automated system update & maintenance script for Ubuntu / Debian
 └── 📁 utils/                            # General standalone helper scripts
-    ├── create_bash_file.sh             # Script generator template
+    ├── create-script-template.sh       # Interactive generator that creates an executable Bash script with standard headers and strict error flags.
     ├── osi_sec_overview                # Custom utility tool: OSI Layer Security Overview
     ├── portscanner.py                  # Python port scanner
     ├── toggle-tailscale.sh             # # Tailscale toggle script with exit node prompt
