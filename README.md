@@ -15,7 +15,7 @@ linux-maintenance-and-dotfiles/
 │   ├── starship.toml                    # Starship prompt configuration
 │   └── topgrade.toml                    # Topgrade auto-updater configuration
 ├── 📁 desktop-tweaks/                    # UI customization & desktop scripts
-│   ├── move_ubuntu_button.txt           # GNOME / Desktop layout modification guide
+│   ├── docs
 │   └── set-login-wallpaper.sh           # Display manager wallpaper script
 ├── 📁 security/                          # Antivirus & system defense utilities
 │   ├── ClamAV Signature Update          # Antivirus database updater
