@@ -23,7 +23,7 @@ linux-maintenance-and-dotfiles/
 │   ├── clamav-scan.timer                # Systemd timer unit scheduling scans at 2:00 AM
 │   ├── run-clamav-scan.sh               # Manual on-demand ClamAV terminal scanner
 │   ├── secure-cachyos.sh                # CachyOS firewall, AppArmor & sysctl hardening
-│   └── update-clamav-signatures.sh      # Antivirus database updater
+│   └── update-clamav-signatures.sh      # Manual Freshclam signature updater script
 ├── 📁 updates/                           # Distro maintenance & update scripts
 │   ├── Clean Mint 22.3                  # Linux Mint cleanup routine
 │   ├── Cleanup Script                   # Disk & system cleanup utility
