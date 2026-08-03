@@ -35,7 +35,7 @@ linux-maintenance-and-dotfiles/
 │   └── update-ubuntu.sh                # Automated system update & maintenance script for Ubuntu / Debian
 └── 📁 utils/                            # General standalone helper scripts
     ├── create-script-template.sh       # Interactive generator that creates an executable Bash script with standard headers and strict error flags.
-    ├── manage-vpn.sh                   # Network/VPN manager script
+    ├── manage-vpn.sh                   # WireGuard connection toggle (WG-Quick UP/DOWN)
     ├── osi-security-overview.sh        # Custom utility tool: OSI Layer Security Overview
     ├── port-scanner.py                 # Python port scanner
     └── toggle-tailscale.sh             # # Tailscale toggle script with exit node prompt
