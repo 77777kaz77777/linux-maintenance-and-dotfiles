@@ -100,7 +100,7 @@ fi
 # 4. Hardware Firmware Updates (fwupd)
 if command -v fwupdmgr &>/dev/null; then
     log_message "Checking for Hardware Firmware Updates..."
-    fwupdmgr refresh --quiet 2>&1 | tee -a "$LOGFILE" || true
+    fwupdmgr refresh >/dev/null 2>&1 || true
     fwupdmgr get-updates 2>&1 | tee -a "$LOGFILE" || true
 fi
 
