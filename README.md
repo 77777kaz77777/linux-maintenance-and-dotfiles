@@ -16,6 +16,7 @@ linux-maintenance-and-dotfiles/
 │   └── topgrade.toml                   # Topgrade auto-updater configuration
 ├── 📁 desktop-tweaks/                   # UI customization & desktop scripts
 │   ├── docs
+│   ├── konsole-white-on-black.sh       # Sets terminal background to solid black (#000000), default text to pure white
 │   └── set-login-wallpaper.sh          # Display manager wallpaper script
 ├── 📁 security/                         # Antivirus & system defense utilities
 │   ├── clamav-nightly-scan.sh          # Nightly multi-threaded scan script
