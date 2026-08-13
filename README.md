@@ -31,7 +31,7 @@ linux-maintenance-and-dotfiles/
 │   ├── system-cleanup.sh               # Safely cleans temporary files and old system logs.
 │   ├── update-arch.sh                  # Maintenance & update script for Arch Linux / CachyOS
 │   ├── update-fedora-maintenance.sh    # Full system maintenance, DNF/Flatpak updates, and cache cleanup.
-│   ├── update-fedora.sh                # Automated maintenance & upgrade script for Fedora (KDE / Workstation)
+│   ├── update-fedora.sh                # Automated maintenance, backup, & upgrade script for Fedora KDE
 │   ├── update-mint.sh                  # Automated APT, Flatpak, and system cleanup script for Linux Mint.
 │   └── update-ubuntu.sh                # Automated system update & maintenance script for Ubuntu / Debian
 └── 📁 utils/                            # General standalone helper scripts
