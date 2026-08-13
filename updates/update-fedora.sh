@@ -46,7 +46,7 @@ else
 fi
 
 # -----------------------------------------------------------------
-# 3. System Package Updates (DNF & RPM-OSTree fallback)
+# 3. System Package Updates (DNF)
 # -----------------------------------------------------------------
 log_info "Refreshing metadata and upgrading DNF packages..."
 dnf upgrade --refresh -y
@@ -64,19 +64,36 @@ fi
 
 if command -v fwupdmgr &> /dev/null; then
     log_info "Checking device firmware updates..."
-fwupdmgr refresh > /dev/null 2>&1 || true
+    fwupdmgr refresh > /dev/null 2>&1 || true
     fwupdmgr update -y || true
 fi
 
 # -----------------------------------------------------------------
-# 5. System Cleanup
+# 5. Git Source Packages Updates (grub-btrfs)
+# -----------------------------------------------------------------
+TARGET_USER="${SUDO_USER:-$USER}"
+USER_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6)
+GRUB_BTRFS_DIR="${USER_HOME}/grub-btrfs"
+
+if [ -d "$GRUB_BTRFS_DIR/.git" ]; then
+    log_info "Checking for grub-btrfs git repository updates..."
+    git -C "$GRUB_BTRFS_DIR" pull || log_warn "Failed to pull updates for grub-btrfs."
+    make -C "$GRUB_BTRFS_DIR" install || log_warn "Failed to reinstall grub-btrfs."
+    restorecon -Rv /usr/bin/grub-btrfs* /usr/lib/systemd/system/grub-btrfsd.service > /dev/null 2>&1 || true
+    systemctl daemon-reload || true
+    systemctl restart grub-btrfsd || true
+    log_success "grub-btrfs up to date."
+fi
+
+# -----------------------------------------------------------------
+# 6. System Cleanup
 # -----------------------------------------------------------------
 log_info "Removing orphan packages and clearing DNF cache..."
 dnf autoremove -y
 dnf clean all
 
 # -----------------------------------------------------------------
-# 6. Post-Update Snapshot & GRUB Menu Refresh
+# 7. Post-Update Snapshot & GRUB Menu Refresh
 # -----------------------------------------------------------------
 if [ -n "$SNAP_NUM" ] && command -v snapper &> /dev/null; then
     log_info "Creating post-update Snapper pair snapshot for #${SNAP_NUM}..."
@@ -85,7 +102,7 @@ fi
 
 if [ -f /boot/grub2/grub.cfg ]; then
     log_info "Regenerating GRUB boot menu (updating grub-btrfs entries)..."
-    grub2-mkconfig -o /boot/grub2/grub.cfg &> /dev/null || true
+    grub2-mkconfig -o /boot/grub2/grub.cfg || true
 fi
 
-log_success "Maintenance complete! System updated, cleaned, and snapshot registered."
+log_success "Maintenance complete! System updated, cleaned, and snapshots registered in GRUB."
