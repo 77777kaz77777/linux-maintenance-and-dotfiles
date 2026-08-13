@@ -64,7 +64,7 @@ fi
 
 if command -v fwupdmgr &> /dev/null; then
     log_info "Checking device firmware updates..."
-    fwupdmgr refresh --quiet || true
+fwupdmgr refresh > /dev/null 2>&1 || true
     fwupdmgr update -y || true
 fi
 
