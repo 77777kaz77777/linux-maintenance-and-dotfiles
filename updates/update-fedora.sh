@@ -1,126 +1,91 @@
 #!/bin/bash
-# Description: Automated maintenance & upgrade script for Fedora (KDE / Workstation)
+# Description: Automated maintenance, backup, & upgrade script for Fedora KDE
 
 # Exit immediately on unhandled error, unset variable, or piped command failure
 set -euo pipefail
 
-# -----------------------------------------------------------------------------
-# Configuration
-# -----------------------------------------------------------------------------
-LOGDIR="/var/log/packageupdateslogs"
-LOGFILE="${LOGDIR}/update_fedora.log"
-MAX_LOG_SIZE_KB=5000  # Rotate log if it exceeds ~5MB
+# -----------------------------------------------------------------
+# Formatting & Output Helpers
+# -----------------------------------------------------------------
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-# Identify active desktop user (for desktop notifications and user flatpaks)
-TARGET_USER="${SUDO_USER:-$USER}"
-TARGET_UID=$(id -u "$TARGET_USER" 2>/dev/null || echo 1000)
+log_info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
+log_warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error()   { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# Fetch OS release details dynamically
-FEDORA_VERSION=$(grep -oP '(?<=^VERSION_ID=).*' /etc/os-release | tr -d '"' 2>/dev/null || echo "Fedora")
-
-# -----------------------------------------------------------------------------
-# Helpers
-# -----------------------------------------------------------------------------
-# Root Privilege Check
-if [[ $EUID -ne 0 ]]; then
-   echo "[ERROR] This script must be run as root or via sudo." >&2
-   exit 1
+# -----------------------------------------------------------------
+# 1. Privilege & Pre-check Verification
+# -----------------------------------------------------------------
+if [ "$EUID" -ne 0 ]; then
+    log_error "This script must be run as root or with sudo."
+    exit 1
 fi
 
-# Ensure log directory exists with safe permissions
-mkdir -p "$LOGDIR"
-chmod 755 "$LOGDIR"
+log_info "Starting Fedora KDE maintenance and update routine..."
 
-# Simple Log Rotation
-if [[ -f "$LOGFILE" ]] && [[ $(du -k "$LOGFILE" | cut -f1) -ge $MAX_LOG_SIZE_KB ]]; then
-   mv "$LOGFILE" "${LOGFILE}.bak.$(date +%Y%m%d%H%M%S)"
-   touch "$LOGFILE"
-fi
-
-# Write timestamped output to terminal and log file
-log_message() {
-    local TIMESTAMP
-    TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
-    echo -e "[$TIMESTAMP] $1" | tee -a "$LOGFILE"
-}
-
-# Trigger Desktop Notifications
-send_notification() {
-    local TITLE="$1"
-    local BODY="$2"
-    local URGENCY="${3:-normal}" # low, normal, critical
+# -----------------------------------------------------------------
+# 2. Automated Pre-Update Btrfs Snapshot
+# -----------------------------------------------------------------
+SNAP_NUM=""
+if command -v snapper &> /dev/null; then
+    log_info "Creating pre-update Snapper snapshot..."
+    SNAP_NUM=$(snapper -c root create --type pre --cleanup-algorithm number --description "update-fedora.sh pre-update" --print-number || true)
     
-    if command -v notify-send &>/dev/null && [[ "$TARGET_USER" != "root" ]]; then
-        sudo -u "$TARGET_USER" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/${TARGET_UID}/bus" \
-            notify-send -u "$URGENCY" -a "System Updater" "$TITLE" "$BODY" || true
+    if [ -n "$SNAP_NUM" ]; then
+        log_success "Created pre-update snapshot #${SNAP_NUM}."
+    else
+        log_warn "Snapper snapshot creation skipped or failed. Proceeding with update..."
     fi
-}
+else
+    log_warn "Snapper CLI not found. Skipping pre-update snapshot."
+fi
 
-# Cleanup hook in case script encounters a fatal error
-trap_failure() {
-    log_message "[FATAL ERROR] Maintenance script aborted prematurely!"
-    send_notification "System Maintenance Failed" "An error occurred during system updates. Check $LOGFILE for details." "critical"
-}
-trap trap_failure ERR
+# -----------------------------------------------------------------
+# 3. System Package Updates (DNF & RPM-OSTree fallback)
+# -----------------------------------------------------------------
+log_info "Refreshing metadata and upgrading DNF packages..."
+dnf upgrade --refresh -y
 
-# -----------------------------------------------------------------------------
-# Main Maintenance Routine
-# -----------------------------------------------------------------------------
-log_message "=================================================="
-log_message "Starting System Maintenance (Fedora $FEDORA_VERSION)"
-log_message "Running on behalf of user: $TARGET_USER"
-log_message "=================================================="
-
-send_notification "System Maintenance Started" "Updating packages and Flatpaks..." "low"
-
-# 1. Update Fedora RPM Packages (DNF / DNF5)
-log_message "Refreshing RPM repositories and upgrading packages..."
-dnf upgrade --refresh -y 2>&1 | tee -a "$LOGFILE"
-
-# 2. Package Cleanup & Orphan Removal
-log_message "Removing orphan dependencies and clearing package cache..."
-dnf autoremove -y 2>&1 | tee -a "$LOGFILE"
-dnf clean dbcache expire-cache 2>&1 | tee -a "$LOGFILE"
-
-# 3. System-Wide & User Flatpak Updates
-if command -v flatpak &>/dev/null; then
-    log_message "Updating System Flatpaks..."
-    flatpak update -y 2>&1 | tee -a "$LOGFILE"
+# -----------------------------------------------------------------
+# 4. Flatpak & Firmware Updates
+# -----------------------------------------------------------------
+if command -v flatpak &> /dev/null; then
+    log_info "Updating Flatpak applications..."
+    flatpak update -y
     
-    log_message "Cleaning unused Flatpak runtimes..."
-    flatpak uninstall --unused -y 2>&1 | tee -a "$LOGFILE"
-
-    # Update User-level Flatpaks if executed via sudo
-    if [[ "$TARGET_USER" != "root" ]]; then
-        log_message "Updating User Flatpaks for $TARGET_USER..."
-        sudo -u "$TARGET_USER" flatpak update -y 2>&1 | tee -a "$LOGFILE" || true
-    fi
+    log_info "Cleaning unused Flatpak runtimes..."
+    flatpak uninstall --unused -y || true
 fi
 
-# 4. Hardware Firmware Updates (fwupd)
-if command -v fwupdmgr &>/dev/null; then
-    log_message "Checking for Hardware Firmware Updates..."
-    fwupdmgr refresh >/dev/null 2>&1 || true
-    fwupdmgr get-updates 2>&1 | tee -a "$LOGFILE" || true
+if command -v fwupdmgr &> /dev/null; then
+    log_info "Checking device firmware updates..."
+    fwupdmgr refresh --quiet || true
+    fwupdmgr update -y || true
 fi
 
-# 5. Optional KDE Plasma Cache Cleanup
-if [[ "$TARGET_USER" != "root" ]]; then
-    USER_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6)
-    if [[ -n "$USER_HOME" && -d "$USER_HOME" ]]; then
-        if ls "${USER_HOME}/.cache/ksycoca"* 1>/dev/null 2>&1; then
-            log_message "Cleaning KDE System Configuration Cache..."
-            rm -rf "${USER_HOME}/.cache/ksycoca"* 2>/dev/null || true
-        fi
-    fi
+# -----------------------------------------------------------------
+# 5. System Cleanup
+# -----------------------------------------------------------------
+log_info "Removing orphan packages and clearing DNF cache..."
+dnf autoremove -y
+dnf clean all
+
+# -----------------------------------------------------------------
+# 6. Post-Update Snapshot & GRUB Menu Refresh
+# -----------------------------------------------------------------
+if [ -n "$SNAP_NUM" ] && command -v snapper &> /dev/null; then
+    log_info "Creating post-update Snapper pair snapshot for #${SNAP_NUM}..."
+    snapper -c root create --type post --pre-number "$SNAP_NUM" --cleanup-algorithm number --description "update-fedora.sh post-update" || true
 fi
 
-# -----------------------------------------------------------------------------
-# Completion
-# -----------------------------------------------------------------------------
-log_message "All updates completed successfully at $(date)!"
-send_notification "System Maintenance Complete" "Your Fedora system is fully up to date." "normal"
+if [ -f /boot/grub2/grub.cfg ]; then
+    log_info "Regenerating GRUB boot menu (updating grub-btrfs entries)..."
+    grub2-mkconfig -o /boot/grub2/grub.cfg &> /dev/null || true
+fi
 
-# Clear error trap prior to successful exit
-trap - ERR
-exit 0
+log_success "Maintenance complete! System updated, cleaned, and snapshot registered."
