@@ -12,6 +12,7 @@ linux-maintenance-and-dotfiles/
 ├── 📁 configs/                          # Terminal & CLI tool dotfiles
 │   ├── alacritty.toml                  # Alacritty terminal configuration
 │   ├── bash-aliases                    # Shell aliases & shortcuts
+│   ├── dnf.conf                        # see `man dnf.conf` for defaults and possible options
 │   ├── starship.toml                   # Starship prompt configuration
 │   └── topgrade.toml                   # Topgrade auto-updater configuration
 ├── 📁 desktop-tweaks/                   # UI customization & desktop scripts
