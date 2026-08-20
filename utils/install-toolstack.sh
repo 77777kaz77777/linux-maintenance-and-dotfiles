@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+#is a work in progress and will have stuff added and removed 
 # Exit on error, treat unset variables as an error, and fail on pipeline errors
 set -euo pipefail
 
