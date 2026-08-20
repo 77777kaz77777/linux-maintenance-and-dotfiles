@@ -37,7 +37,7 @@ linux-maintenance-and-dotfiles/
 │   └── update-ubuntu.sh                # Automated system update & maintenance script for Ubuntu / Debian
 └── 📁 utils/                            # General standalone helper scripts
     ├── create-script-template.sh       # Interactive generator that creates an executable Bash script with standard headers and strict error flags.
-    ├── install-toolstack.sh            # Exit on error, treat unset variables as an error, and fail on pipeline errors
+    ├── install-toolstack.sh            # is a work in progress and will have stuff added and removed
     ├── manage-vpn.sh                   # WireGuard connection toggle (WG-Quick UP/DOWN)
     ├── osi-security-overview.sh        # Custom utility tool: OSI Layer Security Overview
     ├── port-scanner.py                 # Educational multi-threaded TCP socket scanner (College Project)
