@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Automated Python workstation bootstrap, toolstack installer, and repository script deployment.
 import os
 import sys
 import subprocess
