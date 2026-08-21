@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description: Removes Akonadi/PIM bloat, extra media tools, and cleans caches.
+# Description: Removes Akonadi/PIM bloat, extra media tools, Office suites, recommended unused apps, and cleans caches.
 
 # Exit immediately if a command fails, an unset variable is referenced, or a pipe breaks
 set -euo pipefail
@@ -36,7 +36,6 @@ log_message "=== Starting Fedora $FEDORA_VERSION KDE Plasma Debloat & Cleanup ==
 
 # -----------------------------------------------------------------------------
 # 1. Remove KDE PIM (Personal Information Management) & Akonadi
-#    Safely target specific packages without wildcards to avoid breaking Plasma dependencies.
 # -----------------------------------------------------------------------------
 log_message "Removing KDE PIM stack (KMail, KOrganizer, Kontact) and Akonadi..."
 dnf remove -y \
@@ -51,9 +50,9 @@ dnf remove -y \
     kdepim-runtime 2>&1 | tee -a "$LOGFILE" || true
 
 # -----------------------------------------------------------------------------
-# 2. Remove Redundant Utilities, Media Players & Games
+# 2. Remove Redundant Utilities, Media Players, Games & Extra Apps
 # -----------------------------------------------------------------------------
-log_message "Removing unnecessary default desktop applications..."
+log_message "Removing unnecessary default desktop applications and extra bloat..."
 dnf remove -y \
     dragonplayer \
     elisa-player \
@@ -67,10 +66,37 @@ dnf remove -y \
     kwrite \
     krdc \
     krfb \
-    fedora-media-writer 2>&1 | tee -a "$LOGFILE" || true
+    fedora-media-writer \
+    ktorrent \
+    falkon \
+    konqueror \
+    kamoso \
+    skanlite \
+    skanpage \
+    neochat \
+    tokodon \
+    kget 2>&1 | tee -a "$LOGFILE" || true
 
 # -----------------------------------------------------------------------------
-# 3. Clean DNF Packages, Orphans, and System Caches
+# 3. Remove Office Suites (LibreOffice / OpenOffice)
+# -----------------------------------------------------------------------------
+log_message "Removing LibreOffice and OpenOffice components..."
+dnf remove -y \
+    libreoffice \
+    libreoffice-core \
+    libreoffice-writer \
+    libreoffice-calc \
+    libreoffice-impress \
+    libreoffice-draw \
+    libreoffice-math \
+    libreoffice-base \
+    libreoffice-emailmerge \
+    libreoffice-gtk3 \
+    libreoffice-help-en \
+    openoffice* 2>&1 | tee -a "$LOGFILE" || true
+
+# -----------------------------------------------------------------------------
+# 4. Clean DNF Packages, Orphans, and System Caches
 # -----------------------------------------------------------------------------
 log_message "Removing orphaned dependencies..."
 dnf autoremove -y 2>&1 | tee -a "$LOGFILE"
@@ -82,7 +108,17 @@ log_message "Trimming systemd journal logs (retaining last 7 days)..."
 journalctl --vacuum-time=7d 2>&1 | tee -a "$LOGFILE"
 
 # -----------------------------------------------------------------------------
-# 4. User-Level Cache Cleanup (KDE Sycoca and Thumbnail Cache)
+# 5. Flatpak Cleanup
+# -----------------------------------------------------------------------------
+if command -v flatpak >/dev/null 2>&1; then
+    log_message "Removing unused Flatpak runtimes and applications..."
+    flatpak uninstall --unused -y 2>&1 | tee -a "$LOGFILE"
+else
+    log_message "Flatpak not installed. Skipping Flatpak cleanup."
+fi
+
+# -----------------------------------------------------------------------------
+# 6. User-Level Cache Cleanup (KDE Sycoca and Thumbnail Cache)
 # -----------------------------------------------------------------------------
 TARGET_USER="${SUDO_USER:-$USER}"
 if [[ "$TARGET_USER" != "root" ]]; then
@@ -101,4 +137,4 @@ fi
 # Completion
 # -----------------------------------------------------------------------------
 log_message "=== Debloat and cleanup completed successfully at $(date)! ==="
-echo -e "\n[DONE] System debloated successfully! Rebooting is recommended to stop background Akonadi services."
+echo -e "\n[DONE] System debloated successfully! Rebooting is recommended."
