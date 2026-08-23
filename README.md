@@ -19,13 +19,14 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `starship.toml` | Starship prompt configuration |
 | `topgrade.toml` | Topgrade auto-updater configuration |
 
+
 ### 📁 desktop-tweaks/ (UI customization & desktop scripts)
 
 | File | Description |
 |---|---|
-| `docs` | |
 | `konsole-white-on-black.sh` | Sets terminal background to solid black (#000000), default text to pure white |
 | `set-login-wallpaper.sh` | Display manager wallpaper script |
+
 
 ### 📁 security/ (Antivirus & system defense utilities)
 
@@ -38,6 +39,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `run-clamav-scan.sh` | Manual on-demand ClamAV terminal scanner |
 | `setup-clamav-fedora.sh` | setup-clamav-fedora |
 | `update-clamav-signatures.sh` | Manual Freshclam signature updater script |
+
 
 ### 📁 updates/ (Distro maintenance & update scripts)
 
@@ -52,6 +54,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `update-mint.sh` | Automated APT, Flatpak, and system cleanup script for Linux Mint. |
 | `update-ubuntu.sh` | Automated system update & maintenance script for Ubuntu / Debian |
 
+
 ### 📁 utils/ (General standalone helper scripts)
 
 | File | Description |
@@ -61,5 +64,5 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `osi-security-overview.sh` | Custom utility tool: OSI Layer Security Overview |
 | `port-scanner.py` | Educational multi-threaded TCP socket scanner (College Project) |
 | `setup.py` | Automated Python workstation bootstrap, toolstack installer, and repository script deployment. |
-| `toggle-tailscale.sh` | Tailscale toggle script with exit node prompt |
+| `toggle-tailscale.sh` | # Tailscale toggle script with exit node prompt |
 <!-- END_SECTION:tree -->
