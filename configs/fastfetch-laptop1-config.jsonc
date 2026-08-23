@@ -1,0 +1,141 @@
+#MainLaptop fastfetch config
+
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+  "logo": {
+    "type": "iterm",
+    "source": "~/.config/fastfetch/doom.jpg",
+    "width": 28,
+    "height": 16,
+    "padding": {
+      "top": 1,
+      "left": 1,
+      "bottom": 0,
+      "right": 4
+    }
+  },
+  "display": {
+    "separator": "  ",
+    "color": {
+      "keys": "32",
+      "title": "1;32",
+      "output": "97",
+      "separator": "90"
+    },
+    "key": {
+      "width": 12
+    },
+    "percent": {
+      "type": [
+        "num"
+      ]
+    },
+    "bar": {
+      "char": {
+        "elapsed": "█",
+        "total": "░"
+      },
+      "border": {
+        "left": "",
+        "right": ""
+      },
+      "color": {
+        "elapsed": "32",
+        "total": "90"
+      },
+      "width": 10
+    }
+  },
+  "modules": [
+    {
+      "type": "title",
+      "key": "User",
+      "color": {
+        "user": "32",
+        "at": "90",
+        "host": "97"
+      }
+    },
+    {
+      "type": "custom",
+      "format": "── Distro Info ───────────────────────────────"
+    },
+    {
+      "type": "os",
+      "key": "OS",
+      "format": "{2} {12}"
+    },
+    {
+      "type": "kernel",
+      "key": "Kernel",
+      "format": "{2}"
+    },
+    {
+      "type": "uptime",
+      "key": "Uptime"
+    },
+    {
+      "type": "packages",
+      "key": "Packages"
+    },
+    {
+      "type": "custom",
+      "format": "── Hardware ──────────────────────────────────"
+    },
+    {
+      "type": "host",
+      "key": "Host"
+    },
+    {
+      "type": "cpu",
+      "key": "CPU",
+      "format": "{1}"
+    },
+    {
+      "type": "gpu",
+      "key": "GPU",
+      "format": "{2}"
+    },
+    {
+      "type": "memory",
+      "key": "Memory",
+      "format": "{1} / {2} ({3})"
+    },
+    {
+      "type": "disk",
+      "key": "Disk",
+      "format": "{1} / {2} ({3})",
+      "hideFolders": "/efi:/boot:/boot/*"
+    },
+    {
+      "type": "battery",
+      "key": "Battery",
+      "format": "({1}) [{4}]"
+    },
+    {
+      "type": "custom",
+      "format": "── Terminal & Shell ──────────────────────────"
+    },
+    {
+      "type": "de",
+      "key": "DE"
+    },
+    {
+      "type": "wm",
+      "key": "WM"
+    },
+    {
+      "type": "shell",
+      "key": "Shell"
+    },
+    {
+      "type": "terminal",
+      "key": "Terminal"
+    },
+    {
+      "type": "colors",
+      "key": "Palette",
+      "symbol": "circle"
+    }
+  ]
+}
