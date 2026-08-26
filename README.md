@@ -63,6 +63,6 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `manage-vpn.sh` | WireGuard connection toggle (WG-Quick UP/DOWN) |
 | `osi-security-overview.sh` | Custom utility tool: OSI Layer Security Overview |
 | `port-scanner.py` | Educational multi-threaded TCP socket scanner (College Project) |
-| `setup.py` | Automated Python workstation bootstrap, toolstack installer, and repository script deployment. |
+| `setup.py` | (work in progress )Automated Python workstation bootstrap, toolstack installer, and repository script deployment. |
 | `toggle-tailscale.sh` | # Tailscale toggle script with exit node prompt |
 <!-- END_SECTION:tree -->
