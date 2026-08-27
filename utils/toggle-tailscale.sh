@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# # Tailscale toggle script with exit node prompt
+ # Tailscale toggle script with exit node prompt
 # Exit node domain
 EXIT_NODE="yourdomain"
 
