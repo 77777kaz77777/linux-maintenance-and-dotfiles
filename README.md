@@ -65,5 +65,5 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `port-scanner.py` | Educational multi-threaded TCP socket scanner (College Project) |
 | `setup.py` | (work in progress )Automated Python workstation bootstrap, toolstack installer, and repository script deployment. |
 | `system-health-report.sh` | Generates a quick diagnostic report of system health, disk usage, and failed systemd services. |
-| `toggle-tailscale.sh` | # Tailscale toggle script with exit node prompt |
+| `toggle-tailscale.sh` | Tailscale toggle script with exit node prompt |
 <!-- END_SECTION:tree -->
