@@ -2,18 +2,6 @@
 
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
-  "logo": {
-    "type": "iterm",
-    "source": "~/.config/fastfetch/doom.jpg",
-    "width": 28,
-    "height": 16,
-    "padding": {
-      "top": 1,
-      "left": 1,
-      "bottom": 0,
-      "right": 4
-    }
-  },
   "display": {
     "separator": "  ",
     "color": {
@@ -79,12 +67,20 @@
       "key": "Packages"
     },
     {
+      "type": "locale",
+      "key": "Locale"
+    },
+    {
       "type": "custom",
       "format": "── Hardware ──────────────────────────────────"
     },
     {
       "type": "host",
       "key": "Host"
+    },
+    {
+      "type": "display",
+      "key": "Display"
     },
     {
       "type": "cpu",
@@ -102,6 +98,10 @@
       "format": "{1} / {2} ({3})"
     },
     {
+      "type": "swap",
+      "key": "Swap"
+    },
+    {
       "type": "disk",
       "key": "Disk",
       "format": "{1} / {2} ({3})",
@@ -113,8 +113,12 @@
       "format": "({1}) [{4}]"
     },
     {
+      "type": "poweradapter",
+      "key": "Power"
+    },
+    {
       "type": "custom",
-      "format": "── Terminal & Shell ──────────────────────────"
+      "format": "── Desktop Environment ───────────────────────"
     },
     {
       "type": "de",
@@ -125,6 +129,30 @@
       "key": "WM"
     },
     {
+      "type": "wmtheme",
+      "key": "WM Theme"
+    },
+    {
+      "type": "theme",
+      "key": "Theme"
+    },
+    {
+      "type": "icons",
+      "key": "Icons"
+    },
+    {
+      "type": "font",
+      "key": "Font"
+    },
+    {
+      "type": "cursor",
+      "key": "Cursor"
+    },
+    {
+      "type": "custom",
+      "format": "── Terminal & Shell ──────────────────────────"
+    },
+    {
       "type": "shell",
       "key": "Shell"
     },
@@ -133,9 +161,23 @@
       "key": "Terminal"
     },
     {
+      "type": "terminalfont",
+      "key": "Term Font"
+    },
+    {
+      "type": "break"
+    },
+    {
       "type": "colors",
       "key": "Palette",
-      "symbol": "circle"
+      "symbol": "circle",
+      "block": {
+        "width": 3,
+        "range": [
+          1,
+          7
+        ]
+      }
     }
   ]
 }
