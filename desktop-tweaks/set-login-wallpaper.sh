@@ -1,5 +1,5 @@
 #!/bin/bash
-# Display manager wallpaper script
+# Script to change and apply the display manager wallpaper. 
 
 # Ensure the script is run with sudo
 if [ "$EUID" -ne 0 ]; then 
