@@ -24,7 +24,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 
 | File | Description |
 |---|---|
-| `konsole-white-on-black.sh` | Sets terminal background to solid black (#000000), default text to pure white |
+| `konsole-white-on-black.sh` | Script to force the Konsole terminal background to solid black (#000000) with pure white text. |
 | `set-login-wallpaper.sh` | Display manager wallpaper script |
 
 
