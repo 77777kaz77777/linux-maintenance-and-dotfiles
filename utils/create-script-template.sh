@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description: Interactive generator that creates an executable Bash script with standard headers and strict error flags.
+# Interactive generator that scaffolds a new, executable Bash script with standard headers and strict error handling flags.
 
 
 set -euo pipefail
