@@ -1,5 +1,4 @@
-# Shell aliases & shortcuts
-│
+# Custom shell aliases and command-line shortcuts.
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
