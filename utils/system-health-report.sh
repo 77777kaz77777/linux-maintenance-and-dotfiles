@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Description: Generates a quick diagnostic report of system health, disk usage, and failed systemd services.
-
+# Diagnostic script that generates a quick report on system health, disk usage, and failed Systemd services.
 # Enforce strict error handling
 set -euo pipefail
 
