@@ -60,7 +60,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | File | Description |
 |---|---|
 | `create-script-template.sh` | Interactive generator that scaffolds a new, executable Bash script with standard headers and strict error handling flags. |
-| `manage-vpn.sh` | WireGuard connection toggle (WG-Quick UP/DOWN) |
+| `manage-vpn.sh` | Quick toggle script to bring WireGuard connections up or down using WG-Quick. |
 | `osi-security-overview.sh` | Custom utility tool: OSI Layer Security Overview |
 | `port-scanner.py` | Educational multi-threaded TCP socket scanner (College Project) |
 | `setup.py` | (Work in Progress) Automated Python workstation bootstrap, toolstack installer, and repository script deployment with GUI. |
