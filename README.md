@@ -38,7 +38,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `harden-cachyos.sh` | Hardening script to apply firewall, AppArmor, and sysctl security tweaks on CachyOS. |
 | `run-clamav-scan.sh` | Script to trigger a manual, on-demand ClamAV scan directly from the terminal. |
 | `setup-clamav-fedora.sh` | Automated script to install and set up ClamAV on Fedora. |
-| `update-clamav-signatures.sh` | Manual Freshclam signature updater script |
+| `update-clamav-signatures.sh` | Script to manually trigger Freshclam and update antivirus signatures. |
 
 
 ### 📁 updates/ (Distro maintenance & update scripts)
