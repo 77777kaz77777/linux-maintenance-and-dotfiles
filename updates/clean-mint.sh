@@ -1,5 +1,6 @@
 #!/bin/bash
-# Linux Mint package & cache cleanup routine
+#  Cleanup routine for clearing out old APT packages and caches on Linux Mint.
+
 # Ensure we are running with sudo
 if [ "$EUID" -ne 0 ]; then 
   echo "Please run as root (use sudo)"
