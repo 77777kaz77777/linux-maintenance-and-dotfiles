@@ -1,5 +1,5 @@
 #!/bin/bash
-# setup-clamav-fedora
+# Automated script to install and set up ClamAV on Fedora.
 
 # Ensure the script is run with root privileges
 if [ "$EUID" -ne 0 ]; then
