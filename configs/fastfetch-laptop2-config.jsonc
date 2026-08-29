@@ -1,5 +1,6 @@
 
-#thinkpad fastfetch config 
+#Fastfetch system info configuration for the secondary laptop (Lenovo ThinkPad T470). 
+
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
   "logo": {
