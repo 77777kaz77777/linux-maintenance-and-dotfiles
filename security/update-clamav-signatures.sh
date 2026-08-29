@@ -1,6 +1,5 @@
 #!/bin/bash
-# Manual Freshclam signature updater script
-
+# Script to manually trigger Freshclam and update antivirus signatures. 
 # Ensure the script is run with root privileges
 if [ "$EUID" -ne 0 ]; then
   echo "This script needs root privileges to stop/start systemd services."
