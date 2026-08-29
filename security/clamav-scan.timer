@@ -1,4 +1,4 @@
-# Systemd timer unit scheduling scans at 2:00 AM
+# Systemd timer unit that schedules the ClamAV scans to run at 2:00 AM
 [Unit]
 Description=Run ClamAV Scan Automatically
 
