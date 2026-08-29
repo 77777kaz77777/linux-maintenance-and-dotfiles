@@ -16,7 +16,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `dnf.conf` | Optimized Fedora DNF package manager config tweaked for max download speeds, parallel downloads, and clean dependency management. |
 | `fastfetch-laptop1-config.jsonc` | Fastfetch system info configuration for the primary laptop (ASUS ROG Zephyrus G15). |
 | `fastfetch-laptop2-config.jsonc` | Fastfetch system info configuration for the secondary laptop (Lenovo ThinkPad T470). |
-| `starship.toml` | Starship prompt configuration |
+| `starship.toml` | Custom prompt configuration for Starship. |
 | `topgrade.toml` | Topgrade auto-updater configuration |
 
 
