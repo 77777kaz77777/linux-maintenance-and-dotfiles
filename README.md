@@ -59,7 +59,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 
 | File | Description |
 |---|---|
-| `create-script-template.sh` | Interactive generator that creates an executable Bash script with standard headers and strict error flags. |
+| `create-script-template.sh` | Interactive generator that scaffolds a new, executable Bash script with standard headers and strict error handling flags. |
 | `manage-vpn.sh` | WireGuard connection toggle (WG-Quick UP/DOWN) |
 | `osi-security-overview.sh` | Custom utility tool: OSI Layer Security Overview |
 | `port-scanner.py` | Educational multi-threaded TCP socket scanner (College Project) |
