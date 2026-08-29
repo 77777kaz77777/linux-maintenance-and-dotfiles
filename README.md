@@ -46,7 +46,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | File | Description |
 |---|---|
 | `clean-mint.sh` | Cleanup routine for clearing out old APT packages and caches on Linux Mint. |
-| `debloat-fedora-kde.sh` | Removes Akonadi/PIM bloat, extra media tools, Office suites, recommended unused apps, and cleans caches. |
+| `debloat-fedora-kde.sh` | Script to remove Akonadi/PIM bloat, unused media tools, office suites, and clear caches on Fedora KDE. |
 | `system-cleanup.sh` | Safely cleans temporary files and old system logs. |
 | `update-arch.sh` | Maintenance & update script for Arch Linux / CachyOS |
 | `update-fedora-maintenance.sh` | Full system maintenance, DNF/Flatpak updates, and cache cleanup. |
