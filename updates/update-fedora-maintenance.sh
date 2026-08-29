@@ -1,6 +1,5 @@
 #!/bin/bash
-# Description: Full system maintenance, DNF/Flatpak updates, and cache cleanup.
-
+# Full-system maintenance routine for Fedora, covering DNF/Flatpak updates and cache cleanup.
 # Exit on error, treat unset variables as error
 set -euo pipefail
 
