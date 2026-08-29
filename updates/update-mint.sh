@@ -1,6 +1,5 @@
 #!/bin/bash
-# Description: Automated APT, Flatpak, and system cleanup script for Linux Mint.
-
+# Automated system update script for Linux Mint handling APT, Flatpaks, and cleanups.
 # Exit immediately if a command exits with a non-zero status
 set -e
 
