@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description: Automated maintenance, backup, & upgrade script for Fedora KDE
+# Automated system maintenance, backup, and upgrade script designed for Fedora KDE.
 
 # Exit immediately on unhandled error, unset variable, or piped command failure
 set -euo pipefail
