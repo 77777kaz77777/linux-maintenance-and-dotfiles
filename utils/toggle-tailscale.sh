@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
- # Tailscale toggle script with exit node prompt
+ # Script to easily toggle Tailscale connections, including a prompt for selecting an exit node.
 # Exit node domain
 EXIT_NODE="yourdomain"
 
