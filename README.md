@@ -35,7 +35,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `clamav-nightly-scan.sh` | Multi-threaded ClamAV scan script designed to run nightly. |
 | `clamav-scan.service` | Systemd service unit responsible for executing the nightly ClamAV scan. |
 | `clamav-scan.timer` | Systemd timer unit that schedules the ClamAV scans to run at 2:00 AM |
-| `harden-cachyos.sh` | CachyOS firewall, AppArmor & sysctl hardening |
+| `harden-cachyos.sh` | Hardening script to apply firewall, AppArmor, and sysctl security tweaks on CachyOS. |
 | `run-clamav-scan.sh` | Manual on-demand ClamAV terminal scanner |
 | `setup-clamav-fedora.sh` | setup-clamav-fedora |
 | `update-clamav-signatures.sh` | Manual Freshclam signature updater script |
