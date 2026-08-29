@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description: Removes Akonadi/PIM bloat, extra media tools, Office suites, recommended unused apps, and cleans caches.
+# Script to remove Akonadi/PIM bloat, unused media tools, office suites, and clear caches on Fedora KDE.
 
 # Exit immediately if a command fails, an unset variable is referenced, or a pipe breaks
 set -euo pipefail
