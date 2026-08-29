@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description: Maintenance & update script for Arch Linux / CachyOS
+# Automated system maintenance and update script for Arch Linux and CachyOS.
 
 # Exit immediately on error, treat unset variables as errors
 set -euo pipefail
