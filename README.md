@@ -13,7 +13,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 |---|---|
 | `alacritty.toml` | Configuration file for the Alacritty terminal emulator. |
 | `bash-aliases` | Custom shell aliases and command-line shortcuts. |
-| `dnf.conf` | Optimized Fedora DNF package manager configuration tuned for maximum download speeds, parallel downloads, and clean dependency management. |
+| `dnf.conf` | Optimized Fedora DNF package manager config tweaked for max download speeds, parallel downloads, and clean dependency management. |
 | `fastfetch-laptop1-config.jsonc` | MainLaptop fastfetch config |
 | `fastfetch-laptop2-config.jsonc` | thinkpad fastfetch config |
 | `starship.toml` | Starship prompt configuration |
