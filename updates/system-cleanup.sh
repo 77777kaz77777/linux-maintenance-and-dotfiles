@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description: Safely cleans temporary files and old system logs.
+# Safe cleanup script for wiping temporary files and old system logs
 
 
 # Strict mode: exit on error, treat unset variables as error
