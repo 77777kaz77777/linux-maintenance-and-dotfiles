@@ -32,7 +32,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 
 | File | Description |
 |---|---|
-| `clamav-nightly-scan.sh` | Nightly multi-threaded scan script |
+| `clamav-nightly-scan.sh` | Multi-threaded ClamAV scan script designed to run nightly. |
 | `clamav-scan.service` | Systemd service unit executing the nightly scan |
 | `clamav-scan.timer` | Systemd timer unit scheduling scans at 2:00 AM |
 | `harden-cachyos.sh` | CachyOS firewall, AppArmor & sysctl hardening |
