@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description: Automated system update & maintenance script for Ubuntu / Debian
+# Automated system update and maintenance script tailored for Ubuntu and Debian. 
 
 # Exit immediately if a command exits with a non-zero status
 set -e
