@@ -1,6 +1,5 @@
 #!/bin/bash
-# Sets terminal background to solid black (#000000), default text to pure white
-
+# Script to force the Konsole terminal background to solid black (#000000) with pure white text.
 set -euo pipefail
 
 # 1. Apply immediate runtime change using standard OSC Escape Sequences and PS1 override
