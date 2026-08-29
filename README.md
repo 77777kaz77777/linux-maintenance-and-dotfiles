@@ -49,7 +49,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `debloat-fedora-kde.sh` | Script to remove Akonadi/PIM bloat, unused media tools, office suites, and clear caches on Fedora KDE. |
 | `system-cleanup.sh` | Safe cleanup script for wiping temporary files and old system logs |
 | `update-arch.sh` | Automated system maintenance and update script for Arch Linux and CachyOS. |
-| `update-fedora-maintenance.sh` | Full system maintenance, DNF/Flatpak updates, and cache cleanup. |
+| `update-fedora-maintenance.sh` | Full-system maintenance routine for Fedora, covering DNF/Flatpak updates and cache cleanup. |
 | `update-fedora.sh` | Automated maintenance, backup, & upgrade script for Fedora KDE |
 | `update-mint.sh` | Automated APT, Flatpak, and system cleanup script for Linux Mint. |
 | `update-ubuntu.sh` | Automated system update & maintenance script for Ubuntu / Debian |
