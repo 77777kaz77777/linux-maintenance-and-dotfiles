@@ -1,5 +1,5 @@
 #!/bin/bash
-# WireGuard connection toggle (WG-Quick UP/DOWN)
+# Quick toggle script to bring WireGuard connections up or down using WG-Quick.
 # Define the configuration file path
 CONFIG_FILE="$HOME/#####/#####"
 
