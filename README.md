@@ -52,7 +52,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `update-fedora-maintenance.sh` | Full-system maintenance routine for Fedora, covering DNF/Flatpak updates and cache cleanup. |
 | `update-fedora.sh` | Automated system maintenance, backup, and upgrade script designed for Fedora KDE. |
 | `update-mint.sh` | Automated system update script for Linux Mint handling APT, Flatpaks, and cleanups. |
-| `update-ubuntu.sh` | Automated system update & maintenance script for Ubuntu / Debian |
+| `update-ubuntu.sh` | Automated system update and maintenance script tailored for Ubuntu and Debian. |
 
 
 ### 📁 utils/ (General standalone helper scripts)
