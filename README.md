@@ -61,7 +61,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 |---|---|
 | `create-script-template.sh` | Interactive generator that scaffolds a new, executable Bash script with standard headers and strict error handling flags. |
 | `manage-vpn.sh` | Quick toggle script to bring WireGuard connections up or down using WG-Quick. |
-| `osi-security-overview.sh` | Custom utility tool: OSI Layer Security Overview |
+| `osi-security-overview.sh` | Custom reference utility that provides a breakdown of security at each OSI layer. |
 | `port-scanner.py` | Educational multi-threaded TCP socket scanner (College Project) |
 | `setup.py` | (Work in Progress) Automated Python workstation bootstrap, toolstack installer, and repository script deployment with GUI. |
 | `system-health-report.sh` | Generates a quick diagnostic report of system health, disk usage, and failed systemd services. |
