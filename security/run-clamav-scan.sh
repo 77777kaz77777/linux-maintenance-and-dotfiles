@@ -1,4 +1,4 @@
-# Manual on-demand ClamAV terminal scanner
+# Script to trigger a manual, on-demand ClamAV scan directly from the terminal.
 #!/bin/bash
 echo "========================================="
 echo "    Starting Manual ClamAV System Scan   "
