@@ -64,6 +64,6 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | `osi-security-overview.sh` | Custom reference utility that provides a breakdown of security at each OSI layer. |
 | `port-scanner.py` | Educational multi-threaded TCP socket scanner (College Project) |
 | `setup.py` | (Work in Progress) Automated Python workstation bootstrap, toolstack installer, and repository script deployment with GUI. |
-| `system-health-report.sh` | Generates a quick diagnostic report of system health, disk usage, and failed systemd services. |
+| `system-health-report.sh` | Diagnostic script that generates a quick report on system health, disk usage, and failed Systemd services. |
 | `toggle-tailscale.sh` | Tailscale toggle script with exit node prompt |
 <!-- END_SECTION:tree -->
