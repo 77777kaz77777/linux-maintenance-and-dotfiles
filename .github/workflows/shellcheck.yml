@@ -1,0 +1,28 @@
+name: ShellCheck
+
+# This tells GitHub Actions to trigger the workflow whenever code is pushed 
+# to the main branch or a pull request targets the main branch.
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  shellcheck:
+    name: Run ShellCheck
+    # Spins up a fresh Ubuntu Linux virtual machine to run the tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: GitHub runners start completely empty. This action securely downloads 
+      # a copy of your repository's code into the runner's workspace so it can be scanned.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: This calls a pre-packaged community Action that installs and runs the 
+      # ShellCheck binary against every shell script found in your repository. 
+      # If it finds bad syntax (like an unquoted variable that could cause word splitting), 
+      # it fails the job and shows you the exact line number.
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
