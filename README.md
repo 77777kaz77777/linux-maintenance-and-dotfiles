@@ -11,7 +11,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 
 | File | Description |
 |---|---|
-| `alacritty.toml` | Configuration file for the Alacritty terminal emulator. |
+| `alacritty.toml` | Alacritty terminal configuration |
 | `bash-aliases` | Custom shell aliases and command-line shortcuts. |
 | `dnf.conf` | Optimized Fedora DNF package manager config tweaked for max download speeds, parallel downloads, and clean dependency management. |
 | `fastfetch-laptop1-config.jsonc` | Fastfetch system info configuration for the primary laptop (ASUS ROG Zephyrus G15). |
