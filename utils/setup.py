@@ -16,8 +16,8 @@ LOG_FILE = "workstation_install.log"
 class SystemManager:
     """Abstracts package management and OS-level operations across different distributions."""
     def __init__(self):
-        self.os_version = "9" # Default fallback for RHEL/CentOS
-        self.os_codename = "bullseye" # Default fallback for APT
+        self.os_version = "9" 
+        self.os_codename = "bullseye" 
         self.distro = self._detect_distro()
         self.de = self._detect_desktop_environment()
         self.pkg_mgr, self.install_cmd, self.remove_cmd, self.update_cmd = self._detect_package_manager()
@@ -46,6 +46,8 @@ class SystemManager:
         
         if "kde" in combined or "plasma" in combined:
             return "kde"
+        elif "gnome" in combined:
+            return "gnome"
         elif "cosmic" in combined:
             return "cosmic"
         elif "cinnamon" in combined:
@@ -155,7 +157,7 @@ class InstallerGUI(tk.Tk):
         self.opt_term = tk.BooleanVar(value=True)
 
         ttk.Checkbutton(options_frame, text="Install Prerequisites & Repositories", variable=self.opt_prereqs).grid(row=0, column=0, sticky="w", padx=10, pady=2)
-        ttk.Checkbutton(options_frame, text="Install Core Toolstack (Brave, Sublime, Podman, Virt-Manager, Tailscale)", variable=self.opt_core).grid(row=1, column=0, sticky="w", padx=10, pady=2)
+        ttk.Checkbutton(options_frame, text="Install Core Toolstack (Brave, Sublime, Podman, Virt-Manager, Tailscale, Alacritty)", variable=self.opt_core).grid(row=1, column=0, sticky="w", padx=10, pady=2)
         ttk.Checkbutton(options_frame, text="Execute Distro/DE Debloat Routine", variable=self.opt_debloat).grid(row=2, column=0, sticky="w", padx=10, pady=2)
         
         ttk.Checkbutton(options_frame, text="Install Flatpaks (LM Studio, Podman Desktop, Zenmap)", variable=self.opt_flatpaks).grid(row=0, column=1, sticky="w", padx=10, pady=2)
@@ -265,7 +267,7 @@ class InstallerGUI(tk.Tk):
 
         if self.opt_prereqs.get():
             self.log("[+] Installing system prerequisites...")
-            pkgs = "curl flatpak golang git wget"
+            pkgs = "curl flatpak golang git wget unzip"
             self.run_cmd(f"{self.sys_mgr.install_cmd} {pkgs}", "Core Prerequisites")
             
             # Apply DNF Optimizations if applicable
@@ -291,7 +293,7 @@ fastestmirror=True
         if self.opt_core.get():
             self.log("[+] Installing core toolstack...")
             brave_pkg = "brave-browser" if self.sys_mgr.pkg_mgr == "apt" else "brave-origin"
-            packages = [brave_pkg, "firefox", "sublime-text", "podman", "virt-manager", "btop", "vlc", "nmap", "fastfetch", "tailscale"]
+            packages = [brave_pkg, "firefox", "sublime-text", "podman", "virt-manager", "btop", "vlc", "nmap", "fastfetch", "tailscale", "alacritty"]
             
             if self.sys_mgr.de == "kde":
                 spectacle = "spectacle" if self.sys_mgr.pkg_mgr != "apt" else "kde-spectacle"
@@ -304,12 +306,14 @@ fastestmirror=True
             self.log(f"[+] Executing tailored debloat for {self.sys_mgr.de.upper()} on {self.sys_mgr.distro}...")
             universal_bloat = ["thunderbird", "libreoffice-core", "libreoffice-writer", "libreoffice-calc", "libreoffice-impress"]
             kde_bloat = ["akonadi", "kmail", "dragonplayer", "kmines", "fedora-media-writer"]
+            gnome_bloat = ["gnome-tour", "epiphany-browser", "gnome-weather", "gnome-clocks", "gnome-maps", "totem", "cheese"]
             cosmic_bloat = ["totem", "evince", "gnome-calendar", "cheese"]
             cinnamon_bloat = ["rhythmbox", "totem", "hexchat"]
             apt_bloat = ["snapd", "gnome-software-plugin-snap"]
 
             remove_list = universal_bloat
             if self.sys_mgr.de == "kde": remove_list += kde_bloat
+            if self.sys_mgr.de == "gnome": remove_list += gnome_bloat
             if self.sys_mgr.de == "cosmic": remove_list += cosmic_bloat
             if self.sys_mgr.de == "cinnamon": remove_list += cinnamon_bloat
             if self.sys_mgr.pkg_mgr == "apt": remove_list += apt_bloat
@@ -401,7 +405,7 @@ fastestmirror=True
                 self.log("[!] Git is not installed. Skipping GitHub deployment.")
 
         if self.opt_term.get():
-            self.log("[+] Configuring Shell Aliases & Terminal Theme...")
+            self.log("[+] Configuring Shell Aliases, Konsole, and Alacritty Themes...")
             
             # 1. Shell Aliases logic
             bashrc_path = Path(self.sys_mgr.real_home) / ".bashrc"
@@ -416,9 +420,6 @@ fastestmirror=True
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
@@ -441,33 +442,20 @@ alias c='clear'
             # 2. Konsole theme logic
             konsole_script_content = r"""#!/bin/bash
 # Sets terminal background to solid black (#000000), default text to pure white
-
 set -euo pipefail
 
-# 1. Apply immediate runtime change using standard OSC Escape Sequences and PS1 override
 apply_runtime_colors() {
-    # OSC 10: Set default text foreground color to White (#FFFFFF)
     printf '\033]10;#FFFFFF\007'
-    
-    # OSC 11: Set default background color to Black (#000000)
     printf '\033]11;#000000\007'
-    
-    # Override immediate subshell prompt variable to remove green ANSI escape codes
     export PS1='\u@\h:\w\$ '
-    
-    # Clear screen buffer to repaint the entire background canvas immediately
     clear
 }
 
-# 2. Generate and store a persistent KDE Konsole Color Scheme file
 apply_persistent_scheme() {
     local scheme_dir="${HOME}/.local/share/konsole"
     local scheme_file="${scheme_dir}/PureWhiteOnBlack.colorscheme"
-
-    # Ensure local Konsole user profile directory exists
     mkdir -p "${scheme_dir}"
 
-    # Write standard INI-formatted Konsole color scheme
     cat << 'EOF' > "${scheme_file}"
 [General]
 Description=Pure White on Black
@@ -475,38 +463,25 @@ Opacity=1
 
 [Background]
 Color=0,0,0
-
 [BackgroundFaint]
 Color=0,0,0
-
 [BackgroundIntense]
 Color=0,0,0
-
 [Foreground]
 Color=255,255,255
-
 [ForegroundFaint]
 Color=200,200,200
-
 [ForegroundIntense]
 Color=255,255,255
-
 [Color0]
 Color=0,0,0
-
 [Color0Intense]
 Color=128,128,128
-
 [Color7]
 Color=220,220,220
-
 [Color7Intense]
 Color=255,255,255
 EOF
-
-    echo "Persistent color scheme created at: ${scheme_file}"
-
-    # Update default profile if it exists in local storage
     local default_profile="${scheme_dir}/Profile 1.profile"
     if [[ -f "${default_profile}" ]]; then
         if grep -q "^ColorScheme=" "${default_profile}"; then
@@ -514,24 +489,17 @@ EOF
         else
             echo "ColorScheme=PureWhiteOnBlack" >> "${default_profile}"
         fi
-        echo "Updated existing profile at: ${default_profile}"
     fi
 }
 
-# 3. Permanently update ~/.bashrc to ensure future interactive sessions use white text
 update_bashrc_prompt() {
     local bashrc="${HOME}/.bashrc"
     local prompt_entry='export PS1="\u@\h:\w\$ "'
-
     if [[ -f "${bashrc}" ]]; then
-        # Append the uncolored prompt declaration if not already present
         if ! grep -qF 'export PS1="\u@\h:\w\$ "' "${bashrc}"; then
             echo "" >> "${bashrc}"
             echo "# Override shell prompt to use default white text" >> "${bashrc}"
             echo "${prompt_entry}" >> "${bashrc}"
-            echo "Updated ${bashrc} with white PS1 prompt definition."
-        else
-            echo "${bashrc} already contains the plain PS1 prompt override."
         fi
     fi
 }
@@ -540,9 +508,7 @@ main() {
     apply_runtime_colors
     apply_persistent_scheme
     update_bashrc_prompt
-    echo "Konsole color scheme and shell prompt updated successfully."
 }
-
 main "$@"
 """
             konsole_sh_path = "/tmp/setup_konsole.sh"
@@ -550,13 +516,142 @@ main "$@"
                 with open(konsole_sh_path, "w") as f:
                     f.write(konsole_script_content)
                 os.chmod(konsole_sh_path, 0o755)
-                # Execute the bash script as the standard user
                 self.run_cmd(f"su - {self.sys_mgr.real_user} -c 'bash {konsole_sh_path}'", "Konsole Color Scheme & Bash Prompt")
             except Exception as e:
                 self.log(f"[✘] Failed to setup Konsole configuration: {e}")
             finally:
                 if os.path.exists(konsole_sh_path):
                     os.remove(konsole_sh_path)
+
+            # 3. Alacritty Font and Theme Logic
+            alacritty_script_content = r"""#!/bin/bash
+set -euo pipefail
+
+# Download and install JetBrains Mono Nerd Font
+curl -LO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+mkdir -p ~/.local/share/fonts/JetBrainsMono
+unzip -q -o JetBrainsMono.zip -d ~/.local/share/fonts/JetBrainsMono
+fc-cache -fv
+rm JetBrainsMono.zip
+
+# Create Alacritty Configuration
+mkdir -p ~/.config/alacritty
+cat << 'EOF' > ~/.config/alacritty/alacritty.toml
+[general]
+live_config_reload = true
+
+[env]
+TERM = "xterm-256color"
+
+[window]
+padding = { x = 12, y = 12 }
+decorations = "Full"
+opacity = 1.0
+blur = true
+startup_mode = "Windowed"
+dynamic_title = true
+
+[font]
+size = 17.0
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
+
+[font.bold_italic]
+family = "JetBrainsMono Nerd Font"
+style = "Bold Italic"
+
+[scrolling]
+history = 10000
+multiplier = 3
+
+[cursor]
+style = { shape = "Block", blinking = "On" }
+blink_interval = 750
+unfocused_hollow = true
+
+[selection]
+save_to_clipboard = true
+
+[colors.primary]
+background = "#121212"
+foreground = "#e0e0e0"
+
+[colors.selection]
+text = "CellForeground"
+background = "#282828"
+
+[colors.normal]
+black   = "#161616"
+red     = "#c30010"
+green   = "#90a959"
+yellow  = "#f4bf75"
+blue    = "#6a9fb5"
+magenta = "#aa759f"
+cyan    = "#75b5aa"
+white   = "#e0e0e0"
+
+[colors.bright]
+black   = "#404040"
+red     = "#e55555"
+green   = "#aac474"
+yellow  = "#feca88"
+blue    = "#82b8c8"
+magenta = "#c28cb8"
+cyan    = "#93d3c3"
+white   = "#ffffff"
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Control"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "C"
+mods = "Control"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "0"
+mods = "Control"
+action = "ResetFontSize"
+
+[[keyboard.bindings]]
+key = "="
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "-"
+mods = "Control"
+action = "DecreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Enter"
+mods = "Control|Shift"
+action = "SpawnNewInstance"
+EOF
+"""
+            alacritty_sh_path = "/tmp/setup_alacritty.sh"
+            try:
+                with open(alacritty_sh_path, "w") as f:
+                    f.write(alacritty_script_content)
+                os.chmod(alacritty_sh_path, 0o755)
+                self.run_cmd(f"su - {self.sys_mgr.real_user} -c 'bash {alacritty_sh_path}'", "Alacritty Setup & Fonts")
+            except Exception as e:
+                self.log(f"[✘] Failed to setup Alacritty: {e}")
+            finally:
+                if os.path.exists(alacritty_sh_path):
+                    os.remove(alacritty_sh_path)
 
         self.log("--- Installation Sequence Complete ---")
         self.btn_start.config(state=tk.NORMAL)
