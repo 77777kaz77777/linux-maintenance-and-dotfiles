@@ -58,6 +58,7 @@ A personal repository dedicated to Linux system maintenance, distro updates, ter
 | File | Description |
 |---|---|
 | `create-script-template.sh` | Interactive generator that scaffolds a new, executable Bash script with standard headers and strict error handling flags. |
+| `fedora_rog_setup.sh` | Optimization and Setup Script for ASUS ROG Zephyrus G15 on Fedora 44 KDE |
 | `manage-vpn.sh` | Quick toggle script to bring WireGuard connections up or down using WG-Quick. |
 | `osi-security-overview.sh` | Custom reference utility that provides a breakdown of security at each OSI layer. |
 | `port-scanner.py` | Educational multi-threaded TCP socket scanner (College Project) |
